@@ -4,6 +4,7 @@ project(unit_tests)
 
 add_executable (unit_tests 
 	unit_tests.cpp
+	plot_file_tests.cpp
 )
 
 target_include_directories (unit_tests PUBLIC ${OpenCL_INCLUDE_DIRS} 

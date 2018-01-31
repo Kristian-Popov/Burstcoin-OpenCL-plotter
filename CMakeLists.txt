@@ -20,14 +20,14 @@ add_subdirectory(unit_tests)
 # Add main project
 project(BurstcoinOpenCLPlotter)
 
-add_executable (burstcoin-opencl-plotter 
-	main.cpp 
+add_executable (burstcoin-opencl-plotter
+	main.cpp
 )
 
 target_include_directories (burstcoin-opencl-plotter PUBLIC ${CMAKE_SOURCE_DIR}
-	${OpenCL_INCLUDE_DIRS} 
-	${CMAKE_SOURCE_DIR}/contrib 
-	${Boost_INCLUDE_DIRS} 
+	${OpenCL_INCLUDE_DIRS}
+	${CMAKE_SOURCE_DIR}/contrib
+	${Boost_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/utils )
 target_link_libraries (burstcoin-opencl-plotter ${OpenCL_LIBRARY} ${Boost_LIBRARIES} utils)
 
