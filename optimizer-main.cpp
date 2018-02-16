@@ -19,13 +19,9 @@ int main( int argc, char** argv )
 
     boost::program_options::options_description desc( "Allowed options" );
     desc.add_options()
-#if 0
         ( "help,h", "produce help message" )
-        ( "input-file,i", po::value<std::vector<std::string>>, "optimize the specified input files, can be given multiple times" )
+        ( "input-file,i", po::value<std::vector<std::string>>(), "optimize the specified input files, can be given multiple times" )
         ( "output-dir,o", po::value<std::string>()->default_value( "" ), "write results to specified folder" )
-#endif
-        ("help", "produce help message")
-        ("compression", po::value<int>(), "set compression level")
         ;
 
     po::positional_options_description p;

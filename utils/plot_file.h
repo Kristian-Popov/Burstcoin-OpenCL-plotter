@@ -47,12 +47,17 @@ public:
         Write data from buffer "data" to file
         Returns count of written bytes
     */
-    uint64_t Write(uint64_t staggerNum, uint64_t scoopNum, const char* data);
+    void Write(uint64_t staggerNum, uint64_t scoopNum, const char* data);
 
     const PlotFileParams& Params()
     {
         return params_;
     }
+    
+    std::string FileName()
+    {
+		return BuildFileNameWithSuffix();
+	}
 private:
     static constexpr const char* optimizationSuffix_ = ".optimizing";
     PlotFileParams params_;

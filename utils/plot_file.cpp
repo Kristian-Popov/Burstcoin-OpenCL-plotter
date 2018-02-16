@@ -27,10 +27,18 @@ void PlotFile::StartCreation( Operation op )
     EXCEPTION_ASSERT( status_ == Status::NotPresent );
     suffix_ = optimizationSuffix_;
     std::string filePath = BuildFileNameWithSuffix();
-    stream_.open( filePath, std::ios_base::out | std::ios_base::binary );
     status_ = Status::OptimizingInProgress;
+    
+    // Open file and close it (basically create it)
+    stream_.open( filePath, std::ios_base::out | std::ios_base::binary );
+    stream_.close();
+    
+    // Reserve space
     boost::filesystem::resize_file( boost::filesystem::path( filePath ), 
         PlotFileMath::CalcPlotFileSize( params_ ) );
+        
+    // Open it again
+    stream_.open( filePath, std::ios_base::out | std::ios_base::binary );
 }
 
 void PlotFile::FinishCreation()
@@ -58,20 +66,19 @@ uint64_t PlotFile::Read(uint64_t staggerNum, uint64_t scoopNum, char * data)
     EXCEPTION_ASSERT(nullptr != data);
     EXCEPTION_ASSERT(Status::Valid == status_);
     uint64_t expectedSize = PlotFileMath::CalcScoopRegionSizeInBytes(params_);
+    stream_.seekg( PlotFileMath::CalcScoopStartOffsetInBytes( params_, staggerNum, scoopNum ) );
     stream_.read(data, expectedSize);
     uint64_t bytesRead = stream_.gcount();
     EXCEPTION_ASSERT(expectedSize == bytesRead);
     return bytesRead;
 }
 
-uint64_t PlotFile::Write(uint64_t staggerNum, uint64_t scoopNum, const char * data)
+void PlotFile::Write(uint64_t staggerNum, uint64_t scoopNum, const char * data)
 {
     EXCEPTION_ASSERT(nullptr != data);
     uint64_t expectedSize = PlotFileMath::CalcScoopRegionSizeInBytes(params_);
+    stream_.seekg( PlotFileMath::CalcScoopStartOffsetInBytes( params_, staggerNum, scoopNum ) );
     stream_.write(data, expectedSize);
-    uint64_t bytesWritten = stream_.gcount();
-    EXCEPTION_ASSERT(expectedSize == bytesWritten);
-    return bytesWritten;
 }
 
 /*
@@ -88,7 +95,8 @@ inline void PlotFile::Initialize( const boost::filesystem::path & filePath )
         }
         else
         {
-            throw std::logic_error( "PlotFile filePath constructor: filePath refers "
+            throw std::logic_error( "PlotFile filePath constructor: filePath " +
+                filePath.string() + " refers "
                 "to something that exists but is not a file." );
         }
     }
@@ -102,6 +110,10 @@ inline void PlotFile::Initialize( const boost::filesystem::path & filePath )
     params_ = params;
     filePathWithoutSuffix_ = filePath;
     stream_.exceptions( std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit );
+    if (status_ == Status::Valid)
+    {
+        stream_.open( filePath.string(), std::ios_base::in | std::ios_base::binary );
+    }
 }
 
 inline std::string PlotFile::BuildFileNameWithoutSuffix()

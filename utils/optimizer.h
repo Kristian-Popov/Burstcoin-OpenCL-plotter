@@ -15,9 +15,12 @@ public:
         std::string outputFilePath = outputPath; // TODO if outputPath points to a directory, add a filename
         //EXCEPTION_ASSERT( PlotFileMath::CalcStaggerCount( ExtractParams( outputFilePath ) ) == 1 ); // TODO is it useful?
 
-        BOOST_LOG_TRIVIAL(info) << "Starting optimization of file " << inputFilePath << " into file " << outputFilePath;
+        PlotFile inputFile( inputFilePath );
+        const PlotFileParams& inputFileParams = inputFile.Params();
+        PlotFileParams optimizedFileParams( inputFileParams.accountNumericId_, inputFileParams.startNonceNum_, inputFileParams.sizeInNonce_, inputFileParams.sizeInNonce_ );
+        PlotFile outputFile( optimizedFileParams, outputFilePath );
 
-        PlotFile inputFile( inputFilePath ), outputFile( outputFilePath );
+        BOOST_LOG_TRIVIAL(info) << "Starting optimization of file " << inputFilePath << " into file " << outputFile.FileName();
 
         const uint64_t availableMemoryInBytes = 8ull * 1024 * 1024 * 1024; // 8 GiB
         EXCEPTION_ASSERT( Utils::CalcAmountOfFreeRAMInBytes() >= availableMemoryInBytes );
