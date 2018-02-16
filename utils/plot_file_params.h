@@ -4,6 +4,9 @@
 
 struct PlotFileParams
 {
+    PlotFileParams()
+    {}
+
 	PlotFileParams(uint64_t accountNumericId, 
 		uint64_t startNonceNum, uint64_t sizeInNonce, uint64_t staggerSizeInNonces)
 	{

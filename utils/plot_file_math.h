@@ -24,4 +24,7 @@ namespace PlotFileMath
     // of different nonces but with the same scoop number (and in one stagger)
     // Calculate size of a scoop region in byes
     uint64_t CalcScoopRegionSizeInBytes( const PlotFileParams& params );
+
+    // Calculate plot file size based on supplied parameters
+    uint64_t CalcPlotFileSize( const PlotFileParams& params );
 }

@@ -1,102 +1,76 @@
 #pragma once
 
 #include <boost/filesystem.hpp>
-#include <boost/tokenizer.hpp>
 
 #include <string>
+#include <fstream>
 
 #include "plot_file_params.h"
 #include "utils.h"
 
+// TODO this class could be greatly implemented using "state" pattern
 class PlotFile
 {
 public:
-	enum class Status
-	{
-		NotPresent,
-		Valid,
-		Corrupted
-	};
+    enum class Status
+    {
+        NotPresent,
+        Valid,
+        Corrupted,
+        OptimizingInProgress
+    };
 
-	PlotFile(const boost::filesystem::path& filePath)
-	{
-		if (boost::filesystem::exists( filePath ))
-		{
-			if (boost::filesystem::is_regular_file( filePath ))
-			{
-				bool longValidation = false;
-				status = IsValid(filePath, longValidation) ? Status::Valid : Status::Corrupted;
-			}
-			else
-			{
-				throw std::logic_error( "PlotFile filePath constructor: filePath refers "
-					"to something that exists but is not a file." );
-			}
-		}
-		else
-		{
-			status = Status::NotPresent;
-		}
-		const PlotFileParams params = ExtractParamsFromFilePath( filePath );
-		Initialize( params, filePath );
-	}
+    enum class Operation
+    {
+        Optimization
+    };
+
+    PlotFile( const boost::filesystem::path& filePath );
 
     PlotFile(const PlotFileParams& params,
-		const boost::filesystem::path& directory)
+        const boost::filesystem::path& directory );
+
+    // Perform operations required before file building like file creation and space allocation
+    void StartCreation( Operation op );
+
+    // Finish file creation process
+    // Currently renames file to an appropriate form
+    void FinishCreation();
+
+    /*
+        Read data from file to buffer "data"
+        Returns count of read bytes
+    */
+    uint64_t Read(uint64_t staggerNum, uint64_t scoopNum, char* data);
+
+    /*
+        Write data from buffer "data" to file
+        Returns count of written bytes
+    */
+    uint64_t Write(uint64_t staggerNum, uint64_t scoopNum, const char* data);
+
+    const PlotFileParams& Params()
     {
-		EXCEPTION_ASSERT( boost::filesystem::exists(directory) && 
-			boost::filesystem::is_directory(directory) );
-		boost::filesystem::path filePath = directory / 
-			BuildFileName( params );
-		Initialize( params, filePath );
+        return params_;
     }
 private:
+    static constexpr const char* optimizationSuffix_ = ".optimizing";
     PlotFileParams params_;
-	boost::filesystem::path& filePath_;
-	Status status;
-	
-	/*
-		Common part of object initialization. filePath MUST be a valid file path with parameters equal to supplied ones
-	*/
-	void Initialize(const PlotFileParams& params,
-		const boost::filesystem::path& filePath)
-	{
-		EXCEPTION_ASSERT( sizeInNonce_ % staggerSizeInNonces_ == 0 );
-        EXCEPTION_ASSERT( sizeInNonce_ >= staggerSizeInNonces_ );
-		params_ = params;
-		filePath_ = filePath;
-	}
-	
-	std::string BuildFileName( const PlotFileParams& params )
-	{
-		return ( boost::format( "%d_%d_%d_%d" ) % params.accountNumericId_ % params.startNonceNum_ % 
-			params.sizeInNonce_ % params.staggerSizeInNonces_ ).str();
-	}
-	
-	PlotFileParams ExtractParamsFromFilePath( const boost::filesystem::path& filePath )
-	{
-		boost::filesystem::path fileName = filePath.filename();
-		typedef boost::tokenizer<boost::char_separator<char> > 
-			tokenizer;
-		tokenizer tokens( fileName.string(), boost::char_separator<char>("_") );
-		std::vector<std::string> tokensVector;
-		std::copy( tokens.begin(), tokens.end(), std::back_inserter(tokensVector) );
-		EXCEPTION_ASSERT( tokensVector.size() == 4 );
-		
-		PlotFileParams result;
-		result.accountNumericId_ = std::stoull( tokensVector.at(0) );
-		result.startNonceNum_ = std::stoull( tokensVector.at(1) );
-		result.sizeInNonce_ = std::stoull( tokensVector.at(2) );
-		result.staggerSizeInNonces_ = std::stoull( tokensVector.at(3) );
-		return result;
-	}
-	
-	bool IsValid(const boost::filesystem::path& filePath, bool longValidation)
-	{
-		EXCEPTION_ASSERT( !longValidation ); // Long validation is not implemented yet
-		PlotFileParams params = ExtractParamsFromFilePath(filePath);
-		bool valid = ( sizeInNonce_ % staggerSizeInNonces_ ) == 0;
-        valid = valid || ( sizeInNonce_ >= staggerSizeInNonces_ );
-		return valid;
-	}
+    boost::filesystem::path filePathWithoutSuffix_;
+    Status status_;
+    std::string suffix_;
+    std::fstream stream_;
+
+    /*
+        Common part of object initialization
+    */
+    void Initialize(const boost::filesystem::path& filePath );
+
+    std::string BuildFileNameWithoutSuffix();
+
+    std::string BuildFileNameWithSuffix();
+
+    PlotFileParams ExtractParamsFromFilePath( const boost::filesystem::path& filePath );
+
+    bool IsValid( const boost::filesystem::path& filePath, bool longValidation );
 };

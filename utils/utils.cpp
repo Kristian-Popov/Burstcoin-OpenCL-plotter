@@ -2,8 +2,11 @@
 
 #include <type_traits>
 
-#include <boost/log/trivial.hpp>
 #include <boost/format.hpp>
+
+#ifdef __linux__
+#   include <sys/sysinfo.h>
+#endif
 
 // TODO move these functions to separate project/repository
 namespace Utils
@@ -110,96 +113,21 @@ namespace Utils
         return resultIter->first;
     }
 
-    boost::compute::program BuildProgram( boost::compute::context& context,
-        const std::string& source,
-        const std::string& buildOptions /*= std::string()*/,
-        const std::vector<std::string>& extensions /*= std::vector<std::string>()*/ )
-    {
-        std::string allSource;
-        for( const std::string& extension : extensions )
-        {
-            allSource += ( boost::format( "#pragma OPENCL EXTENSION %1% : enable\n" ) % extension ).str();
-        }
-        allSource += source;
-
-        // Taken from boost::compute::program::create_with_source() so we have build log
-        // left in case of errors
-        const char *source_string = allSource.c_str();
-
-        cl_int error = 0;
-        cl_program program_ = clCreateProgramWithSource( context,
-            cl_uint( 1 ),
-            &source_string,
-            0,
-            &error );
-        boost::compute::program program;
-        try
-        {
-            if( !program_ )
-            {
-                throw boost::compute::opencl_error( error );
-            }
-            program = boost::compute::program( program_ );
-            program.build( buildOptions );
-            return program;
-        }
-        catch( boost::compute::opencl_error& error )
-        {
-            std::string buildLog;
-            try // Retrieving these values can cause OpenCL errors, so catch them to write at least something about an error
-            {
-                buildLog = program.build_log();
-            }
-            catch( boost::compute::opencl_error& )
-            {
-            }
-
-            if( error.error_code() == CL_BUILD_PROGRAM_FAILURE )
-            {
-                //TODO throw special exception and log outside of utils library
-                BOOST_LOG_TRIVIAL( error ) << "Program failed to build on device " <<
-                    context.get_device().name() << std::endl <<
-                    "Kernel source: " << std::endl << allSource << std::endl <<
-                    "Build options: " << buildOptions << std::endl <<
-                    "Build log: " << buildLog << std::endl;
-            }
-            throw;
-        }
-    }
-
-    boost::compute::kernel BuildKernel( const std::string& name,
-        boost::compute::context& context,
-        const std::string& source,
-        const std::string& buildOptions,
-        const std::vector<std::string>& extensions)
-    {
-        return boost::compute::kernel( BuildProgram( context, source, buildOptions, extensions), name );
-    }
-
     std::string CombineStrings( const std::vector<std::string>& strings, const std::string & delimiter )
     {
         return VectorToString( strings, delimiter );
     }
 
-    // TODO add more generic solution?
-    std::vector<cl_float4> ConvertDouble4ToFloat4Vectors( const std::vector<cl_double4>& vectors )
+    // TODO add versions for other OS
+    uint64_t CalcAmountOfFreeRAMInBytes()
     {
-        std::vector<cl_float4> result;
-        std::transform( vectors.cbegin(), vectors.cend(), std::back_inserter( result ),
-            []( const cl_double4& v ) -> cl_float4
-        {
-            return cl_float4( {
-                static_cast<float>( v.s[0] ),
-                static_cast<float>( v.s[1] ),
-                static_cast<float>( v.s[2] ),
-                static_cast<float>( v.s[3] )
-            } );
-        } );
-        return result;
-    }
-
-    cl_double4 CombineTwoDouble2Vectors( const cl_double2 & a, const cl_double2 & b )
-    {
-        return { a.x, a.y, b.x, b.y };
+#ifdef __linux__
+        struct sysinfo queryResult;
+        EXCEPTION_ASSERT(sysinfo(&queryResult) == 0);
+        return queryResult.freeram * queryResult.mem_unit;
+#else
+        // Entering YOLO mode, return 8 GiB
+        return 8 * 1024 * 1024 * 1024; // 8 GiB
+#endif
     }
 }

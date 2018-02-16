@@ -53,4 +53,9 @@ namespace PlotFileMath
     {
         return scoopSizeInBytes_ * params.staggerSizeInNonces_;
     }
+
+    uint64_t CalcPlotFileSize( const PlotFileParams & params )
+    {
+        return params.sizeInNonce_ * nonceSizeInBytes_;
+    }
 }

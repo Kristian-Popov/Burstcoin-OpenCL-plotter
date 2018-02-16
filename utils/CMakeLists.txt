@@ -5,11 +5,13 @@ project(utils)
 add_library( utils
 	utils.cpp
 	plot_file_math.cpp
+	plot_file.cpp
 
 	plot_file.h
 	plot_file_params.h
 	utils.h
 	plot_file_math.h
+	optimizer.h
 )
 
 target_include_directories (utils PUBLIC ${OpenCL_INCLUDE_DIRS} 

@@ -62,3 +62,14 @@ TEST_CASE( "CalcStaggerCount works as expected in happy-path scenarios", "[PlotF
     REQUIRE( PlotFileMath::CalcStaggerCount( PlotFileParams( 0, 0, 4, 2 ) ) == 2 );
     REQUIRE( PlotFileMath::CalcStaggerCount( PlotFileParams( 0, 0, 1000, 10 ) ) == 100 );
 }
+
+TEST_CASE( "CalcPlotFileSize works as expected in happy-path scenarios", "[PlotFileMath]" ) {
+    REQUIRE( PlotFileMath::CalcPlotFileSize( PlotFileParams( 0, 0, 1, 1 ) ) == nonceSizeInBytes_ );
+    REQUIRE( PlotFileMath::CalcPlotFileSize( PlotFileParams( 0, 0, 2, 1 ) ) == 2 * nonceSizeInBytes_ );
+    REQUIRE( PlotFileMath::CalcPlotFileSize( PlotFileParams( 0, 0, 3, 1 ) ) == 3 * nonceSizeInBytes_ );
+
+    REQUIRE( PlotFileMath::CalcPlotFileSize( PlotFileParams( 0, 0, 2, 2 ) ) == 2 * nonceSizeInBytes_ );
+    REQUIRE( PlotFileMath::CalcPlotFileSize( PlotFileParams( 0, 0, 4, 2 ) ) == 4 * nonceSizeInBytes_ );
+    REQUIRE( PlotFileMath::CalcPlotFileSize( PlotFileParams( 0, 0, 4, 4 ) ) == 4 * nonceSizeInBytes_ );
+    REQUIRE( PlotFileMath::CalcPlotFileSize( PlotFileParams( 0, 0, 1000, 10 ) ) == 1000 * nonceSizeInBytes_ );
+}
