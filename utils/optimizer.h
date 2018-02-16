@@ -19,7 +19,7 @@ public:
 
         PlotFile inputFile( inputFilePath ), outputFile( outputFilePath );
 
-        const uint64_t availableMemoryInBytes = 8 * 1024 * 1024 * 1024; // 8 GiB
+        const uint64_t availableMemoryInBytes = 8ull * 1024 * 1024 * 1024; // 8 GiB
         EXCEPTION_ASSERT( Utils::CalcAmountOfFreeRAMInBytes() >= availableMemoryInBytes );
         EXCEPTION_ASSERT( PlotFileMath::CalcScoopRegionSizeInBytes( outputFile.Params() ) <= availableMemoryInBytes ); // Verify that entire scoop region of output file fits into RAM
         // TODO remove this limitation

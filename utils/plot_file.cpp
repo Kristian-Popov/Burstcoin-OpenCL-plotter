@@ -5,12 +5,12 @@
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
 
-inline PlotFile::PlotFile( const boost::filesystem::path & filePath )
+PlotFile::PlotFile( const boost::filesystem::path & filePath )
 {
     Initialize( filePath );
 }
 
-inline PlotFile::PlotFile( const PlotFileParams & params, const boost::filesystem::path & directory )
+PlotFile::PlotFile( const PlotFileParams & params, const boost::filesystem::path & directory )
 {
     EXCEPTION_ASSERT( boost::filesystem::exists( directory ) &&
         boost::filesystem::is_directory( directory ) );

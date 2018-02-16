@@ -38,13 +38,6 @@ namespace Utils
     */
     std::string FormatQuantityString(int value);
 
-    template<typename T>
-    bool AreFloatValuesClose( T A, T B,
-        T maxAbsDiff, T maxRelDiff ); // TODO not sure about of these differences - T or e.g. long double?
-
-    template bool AreFloatValuesClose<float>( float A, float B, float maxAbsDiff, float maxRelDiff );
-    template bool AreFloatValuesClose<double>( double A, double B, double maxAbsDiff, double maxRelDiff );
-
     /*
     Choose a unit for value from a supplied list convenient for output.
     Preferred range of values suitable for output starts at 1, as small as possible.
