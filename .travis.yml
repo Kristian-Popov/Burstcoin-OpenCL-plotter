@@ -4,6 +4,26 @@ compiler:
   - gcc
 dist: trusty
 sudo: false
+env:
+  global:
+    # Ubuntu version
+    - LINUX_DIST=trusty
+    - DEPS_DIR=${TRAVIS_BUILD_DIR}/deps
+    # Global build options and C++ flags
+    - CXX_FLAGS="-Wall -pedantic -Werror"
+    # Misc
+    - RUN_TESTS=true
+    - COVERAGE=false
+
+script:
+    ############################################################################
+    # Build main and tests
+    ############################################################################
+     - mkdir -p build
+     - cd build
+     - cmake ${CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} ..
+     - make
+
 matrix:
   include:
     # g++ 5 comes with Ubuntu 16.04 LTS (Xenial Xerus)
@@ -34,4 +54,8 @@ matrix:
         - MATRIX_EVAL="brew install gcc && CC=gcc-7 && CXX=g++-7"
 
 before_install:
+    - rvm install 2.3
     - eval "${MATRIX_EVAL}"
+    # Combine global build options with OS/compiler-dependent options
+    - export CMAKE_OPTIONS=${CMAKE_OPTIONS}" "${ENV_CMAKE_OPTIONS}
+    - export CXX_FLAGS=${CXX_FLAGS}" "${ENV_CXX_FLAGS}
