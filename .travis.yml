@@ -10,7 +10,8 @@ env:
     - LINUX_DIST=trusty
     - DEPS_DIR=${TRAVIS_BUILD_DIR}/deps
     # Global build options and C++ flags
-    - CXX_FLAGS="-Wall -pedantic -Werror"
+    # TODO add -Werror?
+    - CXX_FLAGS="-Wall -pedantic"
     # Misc
     - RUN_TESTS=true
     - COVERAGE=false
@@ -48,14 +49,16 @@ matrix:
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
-    - os: osx
-      osx_image: xcode8
-      env:
-        - MATRIX_EVAL="brew install gcc && CC=gcc-7 && CXX=g++-7"
-
 before_install:
-    - rvm install 2.3
     - eval "${MATRIX_EVAL}"
     # Combine global build options with OS/compiler-dependent options
     - export CMAKE_OPTIONS=${CMAKE_OPTIONS}" "${ENV_CMAKE_OPTIONS}
     - export CXX_FLAGS=${CXX_FLAGS}" "${ENV_CXX_FLAGS}
+install:
+	# Download and build Boost
+    - wget -O boost_1_66_0.tar.gz https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.gz
+    - tar xzvf boost_1_66_0.tar.gz
+    - cd boost_1_66_0/
+    - ./bootstrap.sh --with-libraries=program_options,filesystem,system,log
+    - ./b2 -d0 link=static threading=multi variant=release
+    - ./b2 install -d0
