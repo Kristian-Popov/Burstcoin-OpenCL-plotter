@@ -55,7 +55,7 @@ before_install:
     - export CMAKE_OPTIONS=${CMAKE_OPTIONS}" "${ENV_CMAKE_OPTIONS}
     - export CXX_FLAGS=${CXX_FLAGS}" "${ENV_CXX_FLAGS}
 install:
-	# Download and build Boost
+    # Download and build Boost
     - wget -O boost_1_66_0.tar.gz https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.gz
     - tar xzvf boost_1_66_0.tar.gz
     - cd boost_1_66_0/
