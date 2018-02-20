@@ -57,7 +57,7 @@ before_install:
 install:
     # Download and build Boost
     - wget -O boost_1_66_0.tar.gz https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.gz
-    - tar xzvf boost_1_66_0.tar.gz
+    - tar xzf boost_1_66_0.tar.gz
     - cd boost_1_66_0/
     - ./bootstrap.sh --with-libraries=program_options,filesystem,system,log
     - ./b2 -d0 link=static threading=multi variant=release
