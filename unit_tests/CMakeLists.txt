@@ -1,5 +1,17 @@
 cmake_minimum_required (VERSION 3.1)
 
+# Set used language
+enable_language(CXX)
+
+# It is assumed that Boost can be found either by default location is OS (often a case on Linux) or
+# it is located in <project source root>/contrib/boost
+# Minimal Boost version is 1.58
+SET(Boost_USE_STATIC_LIBS ON)
+find_package(Boost 1.58 REQUIRED filesystem log program_options)
+
+# Look for libraries in the following folders
+link_directories(${Boost_LIBRARY_DIRS})
+
 project(unit_tests)
 
 add_executable (unit_tests 

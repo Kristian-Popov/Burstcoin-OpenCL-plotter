@@ -27,7 +27,7 @@ target_include_directories (burstcoin-optimizer PUBLIC ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/contrib
     ${Boost_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}/utils )
-target_link_libraries (burstcoin-optimizer ${Boost_LIBRARIES} utils)
+target_link_libraries (burstcoin-optimizer ${Boost_LIBRARIES} utils pthread)
 
 set_property(TARGET burstcoin-optimizer PROPERTY CXX_STANDARD 14)
 set_property(TARGET burstcoin-optimizer PROPERTY CXX_STANDARD_REQUIRED ON)
