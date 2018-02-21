@@ -1,7 +1,6 @@
 language: cpp
-compiler:
-  - clang
-  - gcc
+# TODO add support for clang and Mac OS X
+compiler: gcc
 dist: trusty
 sudo: required
 env:
@@ -24,6 +23,7 @@ script:
      - cd build
      - cmake ${CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} ..
      - make
+     - cd ..
 
 matrix:
   include:
@@ -65,3 +65,4 @@ install:
     - ./bootstrap.sh --with-libraries=program_options,filesystem,system,log
     - ./b2 -d0 link=static threading=multi variant=release
     - sudo ./b2 install -d0
+    - cd ..
