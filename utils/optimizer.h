@@ -12,6 +12,9 @@ class Optimizer
 public:
     static void Optimize(const std::string& inputFilePath, const std::string& outputPath)
     {
+        // This code is meant to be compiled in 64-bit mode only
+        static_assert( sizeof( size_t ) == 8, "This code is meant to be compiled in 64-bit mode only" );
+
         std::string outputFilePath = outputPath; // TODO if outputPath points to a directory, add a filename
         //EXCEPTION_ASSERT( PlotFileMath::CalcStaggerCount( ExtractParams( outputFilePath ) ) == 1 ); // TODO is it useful?
 
