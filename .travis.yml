@@ -21,7 +21,7 @@ script:
     ############################################################################
      - mkdir -p build
      - cd build
-     - cmake ${CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DBOOST_ROOT="../../boost_1_65_1" ..
+     - cmake ${CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DBOOST_ROOT="../boost_1_65_1" ..
      - make
      - cd ..
 
