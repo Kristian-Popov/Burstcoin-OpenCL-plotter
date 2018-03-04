@@ -13,6 +13,7 @@ env:
     # Misc
     - RUN_TESTS=true
     - COVERAGE=false
+    - NUM_THREADS=4
 
 matrix:
   include:
@@ -84,7 +85,7 @@ script:
      - KEY=1
      - STARTNONCE=0
      - NONCE_COUNT=2
-     - ./mdcct/plot -k ${KEY} -s ${STARTNONCE} -n ${NONCE_COUNT} -d source-files
+     - ./mdcct/plot -k ${KEY} -s ${STARTNONCE} -n ${NONCE_COUNT} -d source-files -t ${NUM_THREADS}
      # Compile omdcct
      - git clone https://github.com/Kristian-Popov/omdcct.git omdcct
      - pushd omdcct
