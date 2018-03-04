@@ -24,10 +24,10 @@ PlotFile::PlotFile( const PlotFileParams & params, const boost::filesystem::path
 void PlotFile::StartCreation( Operation op )
 {
     EXCEPTION_ASSERT( op == Operation::Optimization ); // Remove this when more operations are available
-    EXCEPTION_ASSERT( status_ == Status::NotPresent );
+    EXCEPTION_ASSERT( status_ == PossibleStatuses::NotPresent );
     suffix_ = optimizationSuffix_;
     std::string filePath = BuildFileNameWithSuffix();
-    status_ = Status::OptimizingInProgress;
+    status_ = PossibleStatuses::OptimizingInProgress;
     
     // Open file and close it (basically create it)
     stream_.open( filePath, std::ios_base::out | std::ios_base::binary );
@@ -53,7 +53,7 @@ void PlotFile::FinishCreation()
     bool longValidation = false;
     if ( IsValid( newFilePath, longValidation ) )
     {
-        status_ = Status::Valid;
+        status_ = PossibleStatuses::Valid;
     }
     else
     {
@@ -64,7 +64,7 @@ void PlotFile::FinishCreation()
 uint64_t PlotFile::Read(uint64_t staggerNum, uint64_t scoopNum, char * data)
 {
     EXCEPTION_ASSERT(nullptr != data);
-    EXCEPTION_ASSERT(Status::Valid == status_);
+    EXCEPTION_ASSERT(PossibleStatuses::Valid == status_);
     uint64_t expectedSize = PlotFileMath::CalcScoopRegionSizeInBytes(params_);
     stream_.seekg( PlotFileMath::CalcScoopStartOffsetInBytes( params_, staggerNum, scoopNum ) );
     stream_.read(data, expectedSize);
@@ -91,7 +91,7 @@ inline void PlotFile::Initialize( const boost::filesystem::path & filePath )
         if( boost::filesystem::is_regular_file( filePath ) )
         {
             bool longValidation = false;
-            status_ = IsValid( filePath, longValidation ) ? Status::Valid : Status::Corrupted;
+            status_ = IsValid( filePath, longValidation ) ? PossibleStatuses::Valid : PossibleStatuses::Corrupted;
         }
         else
         {
@@ -102,7 +102,7 @@ inline void PlotFile::Initialize( const boost::filesystem::path & filePath )
     }
     else
     {
-        status_ = Status::NotPresent;
+        status_ = PossibleStatuses::NotPresent;
     }
     PlotFileParams params = ExtractParamsFromFilePath( filePath );
     EXCEPTION_ASSERT( params.sizeInNonce_ % params.staggerSizeInNonces_ == 0 );
@@ -110,7 +110,7 @@ inline void PlotFile::Initialize( const boost::filesystem::path & filePath )
     params_ = params;
     filePathWithoutSuffix_ = filePath;
     stream_.exceptions( std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit );
-    if (status_ == Status::Valid)
+    if (status_ == PossibleStatuses::Valid)
     {
         stream_.open( filePath.string(), std::ios_base::in | std::ios_base::binary );
     }

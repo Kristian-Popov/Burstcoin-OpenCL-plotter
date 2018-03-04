@@ -20,13 +20,22 @@ public:
 
         PlotFile inputFile( inputFilePath );
         const PlotFileParams& inputFileParams = inputFile.Params();
+        if (inputFile.Status() != PlotFile::PossibleStatuses::Valid)
+        {
+            BOOST_LOG_TRIVIAL(error) << "Input file is not a valid plot file or is already fully optimized";
+            return;
+        }
         PlotFileParams optimizedFileParams( inputFileParams.accountNumericId_, inputFileParams.startNonceNum_, inputFileParams.sizeInNonce_, inputFileParams.sizeInNonce_ );
         PlotFile outputFile( optimizedFileParams, outputFilePath );
+        if (outputFile.Status() != PlotFile::PossibleStatuses::NotPresent)
+        {
+            BOOST_LOG_TRIVIAL(error) << "Output file already exists, not going to overwrite it";
+            return;
+        }
 
         BOOST_LOG_TRIVIAL(info) << "Starting optimization of file " << inputFilePath << " into file " << outputFile.FileName();
 
-        const uint64_t availableMemoryInBytes = 8ull * 1024 * 1024 * 1024; // 8 GiB
-        EXCEPTION_ASSERT( Utils::CalcAmountOfFreeRAMInBytes() >= availableMemoryInBytes );
+        const uint64_t availableMemoryInBytes = Utils::CalcAmountOfFreeRAMInBytes();
         EXCEPTION_ASSERT( PlotFileMath::CalcScoopRegionSizeInBytes( outputFile.Params() ) <= availableMemoryInBytes ); // Verify that entire scoop region of output file fits into RAM
         // TODO remove this limitation
         std::vector<char> memoryBuffer( availableMemoryInBytes );
@@ -35,7 +44,7 @@ public:
 
         for (uint64_t scoopNum = minScoopNum; scoopNum <= maxScoopNum; scoopNum++)
         {
-            BOOST_LOG_TRIVIAL(info) << "Copying scoop #" << ScoopNumInHumanConvenientForm( scoopNum ) << " of " << ScoopNumInHumanConvenientForm( maxScoopNum );
+            BOOST_LOG_TRIVIAL(debug) << "Copying scoop #" << ScoopNumInHumanConvenientForm( scoopNum ) << " of " << ScoopNumInHumanConvenientForm( maxScoopNum );
 
             uint64_t offset = 0;
             for (uint64_t staggerNum = 0; staggerNum < PlotFileMath::CalcStaggerCount(inputFile.Params()); ++staggerNum)
@@ -49,7 +58,6 @@ public:
         BOOST_LOG_TRIVIAL(info) << "Renaming file";
 
         outputFile.FinishCreation();
-        // TODO rename file to exclude suffix
 
         BOOST_LOG_TRIVIAL(info) << "Optimization finished";
     }

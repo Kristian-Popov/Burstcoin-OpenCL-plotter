@@ -12,7 +12,7 @@
 class PlotFile
 {
 public:
-    enum class Status
+    enum class PossibleStatuses
     {
         NotPresent,
         Valid,
@@ -58,11 +58,16 @@ public:
     {
 		return BuildFileNameWithSuffix();
 	}
+    
+    PossibleStatuses Status() const
+    {
+        return status_;
+    }
 private:
     static constexpr const char* optimizationSuffix_ = ".optimizing";
     PlotFileParams params_;
     boost::filesystem::path filePathWithoutSuffix_;
-    Status status_;
+    PossibleStatuses status_;
     std::string suffix_;
     std::fstream stream_;
 

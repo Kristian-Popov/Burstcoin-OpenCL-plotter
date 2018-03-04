@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
@@ -12,6 +13,21 @@
 
 #include "optimizer.h"
 
+void CreateOutputDirIfNeeded( std::string& outputDir )
+{
+    if ( boost::filesystem::exists( outputDir ) )
+    {
+        if ( !boost::filesystem::is_directory( outputDir ) )
+        {
+            throw std::runtime_error( "Something that is not a directory occupies the same path as output directory." );
+        }
+    }
+    else
+    {
+        EXCEPTION_ASSERT( boost::filesystem::create_directory( boost::filesystem::path( outputDir ) ) );
+    }
+}
+
 int main( int argc, char** argv )
 {
     namespace log = boost::log::trivial;
@@ -21,7 +37,7 @@ int main( int argc, char** argv )
     desc.add_options()
         ( "help,h", "produce help message" )
         ( "input-file,i", po::value<std::vector<std::string>>(), "optimize the specified input files, can be given multiple times" )
-        ( "output-dir,o", po::value<std::string>()->default_value( "" ), "write results to specified folder" )
+        ( "output-dir,o", po::value<std::string>()->default_value( "" ), "write results to specified folder, if doesn't exist will be createc" )
         ;
 
     po::positional_options_description p;
@@ -36,20 +52,20 @@ int main( int argc, char** argv )
     catch( boost::program_options::invalid_command_line_syntax& e )
     {
         BOOST_LOG_TRIVIAL( fatal ) << "Wrong command line arguments: " << e.what();
-        BOOST_LOG_TRIVIAL( fatal ) << desc;
+        std::cout << desc;
         return EXIT_FAILURE;
     }
     catch (std::exception& e)
     {
         BOOST_LOG_TRIVIAL( fatal ) << "Caught exception when parsing command line arguments: " << e.what();
-        BOOST_LOG_TRIVIAL( fatal ) << desc;
+        std::cout << desc;
         return EXIT_FAILURE;
     }
     boost::program_options::notify( vm );
 
     if( vm.count( "help" ) )
     {
-        BOOST_LOG_TRIVIAL( fatal ) << desc;
+        std::cout << desc;
         return EXIT_FAILURE;
     }
 
@@ -67,6 +83,8 @@ int main( int argc, char** argv )
 
     try
     {
+        CreateOutputDirIfNeeded( outputDir );
+        
         for (const std::string& inputFilePath: inputFiles)
         {
             Optimizer::Optimize( inputFilePath, outputDir );
