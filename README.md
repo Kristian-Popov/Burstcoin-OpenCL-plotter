@@ -1,9 +1,7 @@
 # Burstcoin plotting tools
 
 The set of tools that contains everything you need to plot your hard drives for Burstcoin mining in easy and comfortable way.
-
-The only currently implemented tool is optimizer, but many other tools (including not available elsewhere) is coming.
-
+The only currently implemented tool is optimizer, but many other tools (including not available elsewhere) are coming.
 Currently implemented tools:
 1. Optimizer
 
@@ -13,14 +11,16 @@ Planned:
 4. Plotting plan creator and executor - allows to plan plotting of large space by splitting work into as few files as needed and calculating them one by one (useful for scenarios when you can't leave plotting computer 24x7 and have no time to start plotter/optimizer on every startup)
 
 Project features:
-1. High quality code
+1. High quality code allows easy modification and many features
 2. Automated testing
-3. Unit tests
+3. Unit tests gives confidence that your data are correct
 
 Planned:
-4. A wide selection of features, like resumability, automation
+4. Resumability - plotting/optimizing can be interrupted in the middle and then resumed
+5. Automation
 
-#### Continuous integration status [![Build Status](https://travis-ci.org/Kristian-Popov/Burstcoin-OpenCL-plotter.svg?branch=master)](https://travis-ci.org/Kristian-Popov/Burstcoin-OpenCL-plotter)
+| Travis status | [![Build Status](https://travis-ci.org/Kristian-Popov/Burstcoin-OpenCL-plotter.svg?branch=master)](https://travis-ci.org/Kristian-Popov/Burstcoin-OpenCL-plotter) |
+| --- | --- |
 
 ## Limitations
 
@@ -28,7 +28,7 @@ Currently the only supported platform is Linux x64 (that is 64-bit), tested only
 
 ## Prerequisites
 
-Very recent versions of Boost and CMake are needed for build. New CMake can be downloaded to a subfolder `cmake` at your home by using these simple instructions
+Very recent versions of Boost and CMake are needed for build. New CMake can be downloaded to a subfolder `cmake` at your home directory by using these simple instructions
 
 ```
 pushd ~
@@ -91,9 +91,12 @@ Automated testing is done on Travis platform. If build is successful, that means
 
 The last step is the most important to guarantee data integrity of output files. Verification is performed by creating real plot source files, performing neccesary operations and byte-to-byte comparison to files created by widely used plotter omdcct. This procedure makes sure you'll get the same data as you would with other widely used plotters.
 
+Currently the whole test suite is run on code compiled by two compilers: g++ version 5 (close to default version on Ubuntu 16.04 Xenial Xerus I personally prefer) and g++ version 7 (very modern stable release).
+Ubuntu 14.04 Trusty Tahr is used as operating system.
+
 ## Built With
 
-This project is implemented in C++ (some newer standard) and uses the following third-party libraries:
+This project is implemented in C++14 and uses the following third-party libraries:
 1. Boost (Log, Filesystem etc.)
 2. Catch
 
@@ -110,6 +113,6 @@ This project is licensed under the Apache License, Version 2.0 - see the [LICENS
 
 ## Acknowledgments
 
-* Hat tip to third-party library developers for their high-quality work
+* Hat tip to third-party library developers for their great code and high-quality work
 * My family for support and cookies
 * Inspiration
