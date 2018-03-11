@@ -85,9 +85,18 @@ script:
      - KEY=1
      - STARTNONCE=0
      - NONCE_COUNT=2
-     - ./mdcct/plot -k ${KEY} -s ${STARTNONCE} -n ${NONCE_COUNT} -d source-files -t ${NUM_THREADS}
+     - ./mdcct/plot -k ${KEY} -s ${STARTNONCE} -n ${NONCE_COUNT} -d source-files -m 1 -t ${NUM_THREADS}
      # Compile omdcct
      - git clone https://github.com/Kristian-Popov/omdcct.git omdcct
      - pushd omdcct
      - make
      - popd
+     # Build correct result files using an omdcct
+     - mkdir -p expected-result-files
+     - ./omdcct/plot -k ${KEY} -s ${STARTNONCE} -n ${NONCE_COUNT} -d expected-result-files -t ${NUM_THREADS}
+     # Optimize files using our optimizer
+     - mkdir -p result-files
+     # ./optimizer/burstcoin-optimizer source-files/ -o result-files
+     # Compare files
+     - pushd result-files
+     # find . -type f -exec cmp {} ../expected-result-files/{} \;
