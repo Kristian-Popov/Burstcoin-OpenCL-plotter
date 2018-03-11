@@ -96,7 +96,7 @@ script:
      - ./omdcct/plot -k ${KEY} -s ${STARTNONCE} -n ${NONCE_COUNT} -d expected-result-files -t ${NUM_THREADS}
      # Optimize files using our optimizer
      - mkdir -p result-files
-     # ./optimizer/burstcoin-optimizer source-files/ -o result-files
+     - ./optimizer/burstcoin-optimizer source-files/ -o result-files
      # Compare files
      - pushd result-files
-     # find . -type f -exec cmp {} ../expected-result-files/{} \;
+     - find . -type f -exec cmp {} ../expected-result-files/{} \;
