@@ -84,7 +84,7 @@ script:
      - mkdir -p source-files
      - KEY=1
      - STARTNONCE=0
-     - NONCE_COUNT=2
+     - NONCE_COUNT=40
      - ./mdcct/plot -k ${KEY} -s ${STARTNONCE} -n ${NONCE_COUNT} -d source-files -m 1 -t ${NUM_THREADS}
      # Compile omdcct
      - git clone https://github.com/Kristian-Popov/omdcct.git omdcct
