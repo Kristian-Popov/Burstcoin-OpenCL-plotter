@@ -38,6 +38,7 @@ int main( int argc, char** argv )
         ( "help,h", "produce help message" )
         ( "input-file,i", po::value<std::vector<std::string>>(), "optimize the specified input files, can be given multiple times" )
         ( "output-dir,o", po::value<std::string>()->default_value( "" ), "write results to specified folder, if doesn't exist will be createc" )
+        ( "verbose,v", "write debug output. If given, much more output is written" )
         ;
 
     po::positional_options_description p;
@@ -46,8 +47,7 @@ int main( int argc, char** argv )
     po::variables_map vm;
     try
     {
-        po::store(po::command_line_parser(argc, argv).
-              options(desc).positional(p).run(), vm);
+        po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
     }
     catch( boost::program_options::invalid_command_line_syntax& e )
     {
@@ -68,6 +68,11 @@ int main( int argc, char** argv )
         std::cout << desc;
         return EXIT_FAILURE;
     }
+
+    boost::log::core::get()->set_filter
+    (
+        log::severity >= ( vm.count( "verbose" ) > 0 ? log::severity_level::trace : log::severity_level::info )
+    );
 
     std::vector<std::string> inputFiles = vm["input-file"].as<std::vector<std::string>>();
     if (inputFiles.empty())
