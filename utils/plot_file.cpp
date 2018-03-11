@@ -25,8 +25,7 @@ void PlotFile::StartCreation( Operation op )
 {
     EXCEPTION_ASSERT( op == Operation::Optimization ); // Remove this when more operations are available
     EXCEPTION_ASSERT( status_ == PossibleStatuses::NotPresent );
-    suffix_ = optimizationSuffix_;
-    std::string filePath = BuildFileNameWithSuffix();
+    std::string filePath = BuildFilePathWithSuffix( optimizationSuffix_ );
     status_ = PossibleStatuses::OptimizingInProgress;
     
     // Open file and close it (basically create it)
@@ -45,9 +44,8 @@ void PlotFile::FinishCreation()
 {
     stream_.close();
     
-    boost::filesystem::path oldFilePath = BuildFileNameWithSuffix();
-    boost::filesystem::path newFilePath = BuildFileNameWithoutSuffix();
-    suffix_.clear();
+    boost::filesystem::path oldFilePath = BuildFilePathWithSuffix( optimizationSuffix_ );
+    boost::filesystem::path newFilePath = BuildFilePathWithSuffix();
     boost::filesystem::rename( oldFilePath, newFilePath );
 
     bool longValidation = false;
@@ -112,7 +110,7 @@ inline void PlotFile::Initialize( const boost::filesystem::path & filePath )
     stream_.exceptions( std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit );
     if (status_ == PossibleStatuses::Valid)
     {
-        stream_.open( filePath.string(), std::ios_base::in | std::ios_base::binary );
+        stream_.open( BuildFilePathWithSuffix(), std::ios_base::in | std::ios_base::binary );
     }
 }
 
@@ -125,9 +123,9 @@ inline std::string PlotFile::BuildFileNameWithoutSuffix()
         params_.staggerSizeInNonces_ ).str();
 }
 
-std::string PlotFile::BuildFileNameWithSuffix()
+std::string PlotFile::BuildFilePathWithSuffix( const std::string& suffix /* = "" */ )
 {
-    return BuildFileNameWithoutSuffix() + suffix_;
+    return filePathWithoutSuffix_.string() + suffix;
 }
 
 inline PlotFileParams PlotFile::ExtractParamsFromFilePath( const boost::filesystem::path & filePath )

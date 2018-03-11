@@ -54,9 +54,9 @@ public:
         return params_;
     }
     
-    std::string FileName()
+    std::string FileNameWithPath()
     {
-		return BuildFileNameWithSuffix();
+		return BuildFilePathWithSuffix();
 	}
     
     PossibleStatuses Status() const
@@ -68,7 +68,6 @@ private:
     PlotFileParams params_;
     boost::filesystem::path filePathWithoutSuffix_;
     PossibleStatuses status_;
-    std::string suffix_;
     std::fstream stream_;
 
     /*
@@ -78,7 +77,7 @@ private:
 
     std::string BuildFileNameWithoutSuffix();
 
-    std::string BuildFileNameWithSuffix();
+    std::string BuildFilePathWithSuffix( const std::string& suffix = "" );
 
     PlotFileParams ExtractParamsFromFilePath( const boost::filesystem::path& filePath );
 
