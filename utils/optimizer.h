@@ -36,9 +36,10 @@ public:
         BOOST_LOG_TRIVIAL(info) << "Starting optimization of file " << inputFilePath << " into file " << outputFile.FileNameWithPath();
 
         const uint64_t availableMemoryInBytes = Utils::CalcAmountOfFreeRAMInBytes();
-        EXCEPTION_ASSERT( PlotFileMath::CalcScoopRegionSizeInBytes( outputFile.Params() ) <= availableMemoryInBytes ); // Verify that entire scoop region of output file fits into RAM
+        uint64_t memoryNeededInBytes = PlotFileMath::CalcScoopRegionSizeInBytes( outputFile.Params() );
+        EXCEPTION_ASSERT( memoryNeededInBytes <= availableMemoryInBytes ); // Verify that entire scoop region of output file fits into RAM
         // TODO remove this limitation
-        std::vector<char> memoryBuffer( availableMemoryInBytes );
+        std::vector<char> memoryBuffer( memoryNeededInBytes );
 
         outputFile.StartCreation( PlotFile::Operation::Optimization );
 
@@ -49,7 +50,7 @@ public:
             uint64_t offset = 0;
             for (uint64_t staggerNum = 0; staggerNum < PlotFileMath::CalcStaggerCount(inputFile.Params()); ++staggerNum)
             {
-                 uint64_t dataRead = inputFile.Read( staggerNum, scoopNum, memoryBuffer.data() + offset );
+                uint64_t dataRead = inputFile.Read( staggerNum, scoopNum, memoryBuffer.data() + offset );
                 EXCEPTION_ASSERT( 0 != dataRead );
                 offset += dataRead;
             }
