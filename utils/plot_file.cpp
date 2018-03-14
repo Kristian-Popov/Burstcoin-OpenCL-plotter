@@ -1,6 +1,8 @@
 #include "plot_file.h"
 #include "plot_file_math.h"
 
+#include <regex>
+
 #include <boost/tokenizer.hpp>
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
@@ -130,6 +132,7 @@ std::string PlotFile::BuildFilePathWithSuffix( const std::string& suffix /* = ""
 
 inline PlotFileParams PlotFile::ExtractParamsFromFilePath( const boost::filesystem::path & filePath )
 {
+    EXCEPTION_ASSERT( IsNameValid( filePath ) );
     boost::filesystem::path fileName = filePath.filename();
     typedef boost::tokenizer<boost::char_separator<char> >
         tokenizer;
@@ -153,4 +156,19 @@ inline bool PlotFile::IsValid( const boost::filesystem::path & filePath, bool lo
     bool valid = ( params.sizeInNonce_ % params.staggerSizeInNonces_ ) == 0;
     valid = valid || ( params.sizeInNonce_ >= params.staggerSizeInNonces_ );
     return valid;
+}
+
+bool PlotFile::IsNameValid( const boost::filesystem::path& filePath )
+{
+    /*
+     * Name is considered valid if:
+     * it has all four numbers separated by a single underscore,
+     * file name may have suffix but it has the following limitation:
+     *    if suffix is present, it consists of a dot plus at least one letter
+     *    (other symbols are not allowed)
+     *    cannot have just a dot
+     */
+    std::string fileName = filePath.filename().string();
+    std::regex regex( R"(\d+_\d+_\d+_\d+(\.[a-zA-Z]+)?)" );
+    return std::regex_match( fileName, regex );
 }

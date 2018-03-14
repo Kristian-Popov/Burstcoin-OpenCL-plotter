@@ -63,6 +63,8 @@ public:
     {
         return status_;
     }
+
+    static bool IsNameValid( const boost::filesystem::path& filePath );
 private:
     static constexpr const char* optimizationSuffix_ = ".optimizing";
     PlotFileParams params_;

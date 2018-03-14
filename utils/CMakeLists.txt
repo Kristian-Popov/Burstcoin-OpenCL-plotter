@@ -24,5 +24,7 @@ target_include_directories (utils PUBLIC ${OpenCL_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/contrib 
 	${Boost_INCLUDE_DIRS} )
 
+target_link_libraries (utils ${Boost_LIBRARIES})
+
 set_property(TARGET utils PROPERTY CXX_STANDARD 14)
 set_property(TARGET utils PROPERTY CXX_STANDARD_REQUIRED ON)
