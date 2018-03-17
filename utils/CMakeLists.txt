@@ -18,6 +18,7 @@ add_library( utils
 	utils.h
 	plot_file_math.h
 	optimizer.h
+	nonce_num_range.h
 )
 
 target_include_directories (utils PUBLIC ${OpenCL_INCLUDE_DIRS} 
