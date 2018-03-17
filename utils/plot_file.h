@@ -25,7 +25,7 @@ public:
         Optimization
     };
 
-    PlotFile( const boost::filesystem::path& filePath );
+    explicit PlotFile( const boost::filesystem::path& filePath );
 
     PlotFile(const PlotFileParams& params,
         const boost::filesystem::path& directory );

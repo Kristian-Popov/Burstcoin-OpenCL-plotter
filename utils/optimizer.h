@@ -25,7 +25,10 @@ public:
             BOOST_LOG_TRIVIAL(error) << "Input file is not a valid plot file or is already fully optimized";
             return;
         }
-        PlotFileParams optimizedFileParams( inputFileParams.accountNumericId_, inputFileParams.startNonceNum_, inputFileParams.sizeInNonce_, inputFileParams.sizeInNonce_ );
+        PlotFileParams optimizedFileParams( inputFileParams.accountNumericId_,
+            inputFileParams.nonceNumRange_.StartNonceNum(),
+            inputFileParams.nonceNumRange_.SizeInNonce(),
+            inputFileParams.nonceNumRange_.SizeInNonce() );
         PlotFile outputFile( optimizedFileParams, outputFilePath );
         if (outputFile.Status() != PlotFile::PossibleStatuses::NotPresent)
         {

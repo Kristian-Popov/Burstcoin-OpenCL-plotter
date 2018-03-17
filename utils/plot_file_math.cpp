@@ -11,7 +11,7 @@ namespace PlotFileMath
 {
     uint64_t CalcStaggerCount( const PlotFileParams & params )
     {
-        return params.sizeInNonce_ / params.staggerSizeInNonces_;
+        return params.nonceNumRange_.SizeInNonce() / params.staggerSizeInNonces_;
     }
 
     // Calculate an offset to the first byte of the stagger
@@ -29,9 +29,9 @@ namespace PlotFileMath
     // Calculate in which stagger nonce "nonceNum" is located
     uint64_t CalcStaggerNum( const PlotFileParams & params, uint64_t nonceNum )
     {
-        EXCEPTION_ASSERT( nonceNum >= params.startNonceNum_ &&
-            nonceNum < params.startNonceNum_ + params.sizeInNonce_ );
-        uint64_t nonceNumFromFileStart = nonceNum - params.startNonceNum_;
+        EXCEPTION_ASSERT( nonceNum >= params.nonceNumRange_.StartNonceNum() &&
+            nonceNum <= params.nonceNumRange_.LastNonceNum() );
+        uint64_t nonceNumFromFileStart = nonceNum - params.nonceNumRange_.StartNonceNum();
         uint64_t staggerNum = nonceNumFromFileStart / params.staggerSizeInNonces_;
         return staggerNum;
     }
@@ -56,6 +56,6 @@ namespace PlotFileMath
 
     uint64_t CalcPlotFileSize( const PlotFileParams & params )
     {
-        return params.sizeInNonce_ * nonceSizeInBytes_;
+        return params.nonceNumRange_.SizeInNonce() * nonceSizeInBytes_;
     }
 }

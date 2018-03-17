@@ -6,6 +6,9 @@
 class NonceNumRange
 {
 public:
+    NonceNumRange()
+    {}
+
     NonceNumRange( uint64_t startNonceNum, uint64_t sizeInNonce )
         : startNonceNum_( startNonceNum )
         , sizeInNonce_( sizeInNonce )

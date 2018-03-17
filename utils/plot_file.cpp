@@ -105,8 +105,8 @@ inline void PlotFile::Initialize( const boost::filesystem::path & filePath )
         status_ = PossibleStatuses::NotPresent;
     }
     PlotFileParams params = ExtractParamsFromFilePath( filePath );
-    EXCEPTION_ASSERT( params.sizeInNonce_ % params.staggerSizeInNonces_ == 0 );
-    EXCEPTION_ASSERT( params.sizeInNonce_ >= params.staggerSizeInNonces_ );
+    EXCEPTION_ASSERT( params.nonceNumRange_.SizeInNonce() % params.staggerSizeInNonces_ == 0 );
+    EXCEPTION_ASSERT( params.nonceNumRange_.SizeInNonce() >= params.staggerSizeInNonces_ );
     params_ = params;
     filePathWithoutSuffix_ = filePath;
     stream_.exceptions( std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit );
@@ -120,8 +120,8 @@ inline std::string PlotFile::BuildFileNameWithoutSuffix()
 {
     return ( boost::format( "%d_%d_%d_%d" ) % 
         params_.accountNumericId_ % 
-        params_.startNonceNum_ %
-        params_.sizeInNonce_ % 
+        params_.nonceNumRange_.StartNonceNum() %
+        params_.nonceNumRange_.SizeInNonce() %
         params_.staggerSizeInNonces_ ).str();
 }
 
@@ -141,20 +141,19 @@ inline PlotFileParams PlotFile::ExtractParamsFromFilePath( const boost::filesyst
     std::copy( tokens.begin(), tokens.end(), std::back_inserter( tokensVector ) );
     EXCEPTION_ASSERT( tokensVector.size() == 4 );
 
-    PlotFileParams result;
-    result.accountNumericId_ = std::stoull( tokensVector.at( 0 ) );
-    result.startNonceNum_ = std::stoull( tokensVector.at( 1 ) );
-    result.sizeInNonce_ = std::stoull( tokensVector.at( 2 ) );
-    result.staggerSizeInNonces_ = std::stoull( tokensVector.at( 3 ) );
-    return result;
+    uint64_t accountNumericId = std::stoull( tokensVector.at( 0 ) );
+    uint64_t startNonceNum = std::stoull( tokensVector.at( 1 ) );
+    uint64_t sizeInNonce = std::stoull( tokensVector.at( 2 ) );
+    uint64_t staggerSizeInNonces = std::stoull( tokensVector.at( 3 ) );
+    return PlotFileParams( accountNumericId, NonceNumRange( startNonceNum, sizeInNonce ), staggerSizeInNonces );
 }
 
 inline bool PlotFile::IsValid( const boost::filesystem::path & filePath, bool longValidation )
 {
     EXCEPTION_ASSERT( !longValidation ); // Long validation is not implemented yet
     PlotFileParams params = ExtractParamsFromFilePath( filePath );
-    bool valid = ( params.sizeInNonce_ % params.staggerSizeInNonces_ ) == 0;
-    valid = valid || ( params.sizeInNonce_ >= params.staggerSizeInNonces_ );
+    bool valid = ( params.nonceNumRange_.SizeInNonce() % params.staggerSizeInNonces_ ) == 0;
+    valid = valid || ( params.nonceNumRange_.SizeInNonce() >= params.staggerSizeInNonces_ );
     return valid;
 }
 

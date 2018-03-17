@@ -59,7 +59,6 @@ TEST_CASE( "CalcStaggerStartOffsetInBytes throws exception when trying to access
 }
 
 TEST_CASE( "CalcScoopRegionSizeInBytes works as expected in happy-path scenarios", "[PlotFileMath]" ) {
-    REQUIRE( PlotFileMath::CalcScoopRegionSizeInBytes( PlotFileParams( 0, 0, 0, 0 ) ) == 0 );
     REQUIRE( PlotFileMath::CalcScoopRegionSizeInBytes( PlotFileParams( 0, 0, 1, 1 ) ) == scoopSizeInBytes_ );
     REQUIRE( PlotFileMath::CalcScoopRegionSizeInBytes( PlotFileParams( 0, 0, 2, 1 ) ) == scoopSizeInBytes_ );
     REQUIRE( PlotFileMath::CalcScoopRegionSizeInBytes( PlotFileParams( 0, 0, 2, 2 ) ) == 2 * scoopSizeInBytes_ );
