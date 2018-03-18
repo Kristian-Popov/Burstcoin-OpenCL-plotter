@@ -125,13 +125,11 @@ TEST_CASE( "CalcIntersectionWith method works as expected", "[NonceNumRange]" )
     }
 }
 
-#if 0
-// TODO enable this test when robust code for overflow check is implemented
 TEST_CASE( "NonceNumRange throws an exception in constructor if nonce number overflow will happen", "[NonceNumRange]" )
 {
     REQUIRE_THROWS( NonceNumRange( ULLONG_MAX, 10 ) );
     REQUIRE_THROWS( NonceNumRange( ULLONG_MAX - 10, 20 ) );
-    REQUIRE_THROWS( NonceNumRange( ULLONG_MAX - 1, 2 ) );
-    REQUIRE_THROWS( NonceNumRange( ULLONG_MAX - 1000000, 1000001 ) );
+    REQUIRE_THROWS( NonceNumRange( ULLONG_MAX, 2 ) );
+    REQUIRE_THROWS( NonceNumRange( ULLONG_MAX - 1, 3 ) );
+    REQUIRE_THROWS( NonceNumRange( ULLONG_MAX - 2, 4 ) );
 }
-#endif

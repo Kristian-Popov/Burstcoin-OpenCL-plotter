@@ -17,7 +17,8 @@ public:
         , sizeInNonce_( sizeInNonce )
     {
         EXCEPTION_ASSERT( sizeInNonce_ > 0 );
-        //EXCEPTION_ASSERT( ( ULLONG_MAX - sizeInNonce ) > ( startNonceNum - 1 ) ); // TODO this is overflow protection, test it with unit tests
+        // Since we're using unsigned values, we can safely permit overflow and easily check if we encounter it
+        EXCEPTION_ASSERT( LastNonceNum() >= startNonceNum_ );
     }
 
     uint64_t StartNonceNum() const
