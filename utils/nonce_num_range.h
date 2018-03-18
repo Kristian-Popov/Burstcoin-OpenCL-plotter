@@ -3,6 +3,9 @@
 #include "utils.h"
 #include <climits>
 
+#include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
+
 class NonceNumRange
 {
 public:
@@ -32,13 +35,35 @@ public:
         return startNonceNum_ + sizeInNonce_ - 1;
     }
 
-    // Based on https://stackoverflow.com/a/3269442
-    bool OverlapsWith( const NonceNumRange& rhs ) const
+    // Based on https://stackoverflow.com/a/42123103
+    /*
+     * Calculate what nonces can be found in both ranges.
+     * If result has no value, ranges do not intersect with each other.
+     */
+    boost::optional<NonceNumRange> CalcIntersectionWith( const NonceNumRange& rhs ) const
     {
-        return LastNonceNum() >= rhs.StartNonceNum() && StartNonceNum() <= rhs.LastNonceNum();
+        boost::optional<NonceNumRange> result;
+        auto start = std::max( startNonceNum_, rhs.startNonceNum_ );
+        auto end = std::min( LastNonceNum(), rhs.LastNonceNum() );
+        if ( start <= end )
+        {
+            result = NonceNumRange( start, end - start + 1 );
+        }
+        return result;
     }
 
+    bool operator==( const NonceNumRange& rhs ) const
+    {
+        return this->startNonceNum_ == rhs.startNonceNum_ && this->sizeInNonce_ == rhs.sizeInNonce_;
+    }
+
+    bool operator!=( const NonceNumRange& rhs ) const
+    {
+        return !( *this == rhs );
+    }
 private:
     uint64_t startNonceNum_ = 0;
     uint64_t sizeInNonce_ = 0;
 };
+
+std::ostream& operator<< (std::ostream& stream, const NonceNumRange& range);

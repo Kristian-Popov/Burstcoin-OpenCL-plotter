@@ -62,66 +62,66 @@ TEST_CASE( "LastNonceNum method works as expected", "[NonceNumRange]" )
     }
 }
 
-TEST_CASE( "OverlapsWith method works as expected", "[NonceNumRange]" )
+TEST_CASE( "CalcIntersectionWith method works as expected", "[NonceNumRange]" )
 {
     {
         NonceNumRange lhs( 0, 10 );
         NonceNumRange rhs( 10, 10 );
-        REQUIRE( lhs.OverlapsWith( rhs ) == false );
+        REQUIRE( !lhs.CalcIntersectionWith( rhs ) );
     }
 
     {
         NonceNumRange lhs( 0, 5 );
         NonceNumRange rhs( 5, 5 );
-        REQUIRE( lhs.OverlapsWith( rhs ) == false );
+        REQUIRE( !lhs.CalcIntersectionWith( rhs ) );
     }
 
     {
         NonceNumRange lhs( 1000, 10 );
         NonceNumRange rhs( 10, 10 );
-        REQUIRE( lhs.OverlapsWith( rhs ) == false );
+        REQUIRE( !lhs.CalcIntersectionWith( rhs ) );
     }
 
     {
         NonceNumRange lhs( 0, 10 );
         NonceNumRange rhs( 0, 10 );
-        REQUIRE( lhs.OverlapsWith( rhs ) == true );
+        REQUIRE( lhs.CalcIntersectionWith( rhs ) == rhs );
     }
 
     {
         NonceNumRange lhs( 0, 10 );
         NonceNumRange rhs( 0, 11 );
-        REQUIRE( lhs.OverlapsWith( rhs ) == true );
+        REQUIRE( lhs.CalcIntersectionWith( rhs ) == lhs );
     }
 
     {
         NonceNumRange lhs( 100, 100 );
         NonceNumRange rhs( 100, 100 );
-        REQUIRE( lhs.OverlapsWith( rhs ) == true );
+        REQUIRE( lhs.CalcIntersectionWith( rhs ) == lhs );
     }
 
     {
         NonceNumRange lhs( 10, 10 );
         NonceNumRange rhs( 0, 10 );
-        REQUIRE( lhs.OverlapsWith( rhs ) == false );
+        REQUIRE( !lhs.CalcIntersectionWith( rhs ) );
     }
 
     {
         NonceNumRange lhs( 0, 20 );
-        NonceNumRange rhs( 10, 10 );
-        REQUIRE( lhs.OverlapsWith( rhs ) == true );
+        NonceNumRange rhs( 15, 10 );
+        REQUIRE( lhs.CalcIntersectionWith( rhs ) == NonceNumRange( 15, 5 ) );
     }
 
     {
         NonceNumRange lhs( 0, 10 );
         NonceNumRange rhs( 1, 1 );
-        REQUIRE( lhs.OverlapsWith( rhs ) == true );
+        REQUIRE( lhs.CalcIntersectionWith( rhs ) == rhs );
     }
 
     {
         NonceNumRange lhs( 1000, 1000 );
         NonceNumRange rhs( 1000, 20000 );
-        REQUIRE( lhs.OverlapsWith( rhs ) == true );
+        REQUIRE( lhs.CalcIntersectionWith( rhs ) == lhs );
     }
 }
 
