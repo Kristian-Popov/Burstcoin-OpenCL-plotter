@@ -19,6 +19,7 @@ add_executable (unit_tests
 	plot_file_tests.cpp
 	plot_file_math_tests.cpp
 	nonce_num_range_tests.cpp
+	utils_unit_tests.cpp
 )
 
 target_include_directories (unit_tests PUBLIC ${OpenCL_INCLUDE_DIRS} 
