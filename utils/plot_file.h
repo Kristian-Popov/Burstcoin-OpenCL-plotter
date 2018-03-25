@@ -30,6 +30,8 @@ public:
     PlotFile(const PlotFileParams& params,
         const boost::filesystem::path& directory );
 
+    explicit PlotFile( const PlotFile& val ) = default; // TODO is copy constructor really neccesary?
+
     // Perform operations required before file building like file creation and space allocation
     void StartCreation( Operation op );
 
@@ -49,7 +51,7 @@ public:
     */
     void Write(uint64_t staggerNum, uint64_t scoopNum, const char* data);
 
-    const PlotFileParams& Params()
+    const PlotFileParams& Params() const
     {
         return params_;
     }
@@ -62,6 +64,11 @@ public:
     PossibleStatuses Status() const
     {
         return status_;
+    }
+
+    boost::optional<NonceNumRange> CalcNonceRangeIntersectionWith( const PlotFile& rhs ) const
+    {
+        return params_.nonceNumRange_.CalcIntersectionWith( rhs.Params().nonceNumRange_ );
     }
 
     static bool IsNameValid( const boost::filesystem::path& filePath );

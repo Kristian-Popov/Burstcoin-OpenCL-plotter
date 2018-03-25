@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.1)
 
-project(utils)
+project(utils) # TODO is it needed? May be use one project for all executables/libraries?
 
 # It is assumed that Boost can be found either by default location is OS (often a case on Linux) or
 # it is located in <project source root>/contrib/boost
@@ -20,6 +20,8 @@ add_library( utils
 	plot_file_math.h
 	optimizer.h
 	nonce_num_range.h
+	plot_file_scanner.h
+	overlap_checker.h
 )
 
 target_include_directories (utils PUBLIC ${OpenCL_INCLUDE_DIRS} 
