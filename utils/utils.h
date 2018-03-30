@@ -30,6 +30,17 @@ namespace Utils
         v1.insert( v1.end(), v2.begin(), v2.end() );
     }
 
+    template <typename T>
+    void AppendVectorToVector( T& v1, T&& v2 )
+    {
+        // TODO improve, probably this variant is slow
+        v1.reserve( v1.size() + v2.size() );
+        for ( auto&& val: v2 )
+        {
+            v1.push_back( std::move( val ) );
+        }
+    }
+
     /*
         Formats text representation of large values:
         - for 1-1000, returned as is

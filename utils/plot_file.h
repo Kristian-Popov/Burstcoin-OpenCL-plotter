@@ -30,8 +30,6 @@ public:
     PlotFile(const PlotFileParams& params,
         const boost::filesystem::path& directory );
 
-    explicit PlotFile( const PlotFile& val ) = default; // TODO is copy constructor really neccesary?
-
     // Perform operations required before file building like file creation and space allocation
     void StartCreation( Operation op );
 

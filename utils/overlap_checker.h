@@ -15,19 +15,26 @@ class OverlapChecker
 public:
     static void CheckForNonceOverlaps( const std::vector<std::string>& directories )
     {
-        std::vector<PlotFile> plotFiles;
+        std::vector<std::unique_ptr<PlotFile>> plotFiles;
         for (const std::string& dir: directories)
         {
-            Utils::AppendVectorToVector( plotFiles, PlotFileScanner::Scan( dir ) ); // TODO need to avoid copy construction here
+            Utils::AppendVectorToVector( plotFiles, PlotFileScanner::Scan( dir ) );
         }
-        // TODO print in verbose mode all found plot files?
+
+        for ( const std::unique_ptr<PlotFile>& plotFile: plotFiles )
+        {
+            BOOST_LOG_TRIVIAL(debug) << "Found plot file at path " << plotFile->FileNameWithPath();
+
+            // Verify that all pointers are not empty
+            EXCEPTION_ASSERT( plotFile );
+        }
 
         // TODO remove duplicate plot files (multiple representations of the same plot file)?
         std::vector<NonceNumRange> overlaps;
         ExecutePairWise( plotFiles.begin(), plotFiles.end(), [&overlaps]
-        ( const PlotFile& lhs, const PlotFile& rhs )
+        ( const std::unique_ptr<PlotFile>& lhs, const std::unique_ptr<PlotFile>& rhs )
         {
-            boost::optional<NonceNumRange> possibleOverlap = lhs.CalcNonceRangeIntersectionWith( rhs );
+            boost::optional<NonceNumRange> possibleOverlap = lhs->CalcNonceRangeIntersectionWith( *rhs );
             if (possibleOverlap)
             {
                 overlaps.push_back( possibleOverlap.value() );
@@ -40,8 +47,8 @@ public:
         }
         else
         {
-            BOOST_LOG_TRIVIAL(error) << "Overlaps found: " << overlaps.at(0);
-            // TODO print what exactly intersections are found
+            // TODO remove duplicates in overlaps
+            BOOST_LOG_TRIVIAL(error) << "Overlaps found: " << Utils::VectorToString( overlaps );
         }
     }
 };
