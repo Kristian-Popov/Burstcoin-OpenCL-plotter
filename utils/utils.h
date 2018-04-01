@@ -125,22 +125,22 @@ namespace Utils
     }
 
     uint64_t CalcAmountOfFreeRAMInBytes();
-}
 
-// Based on https://codereview.stackexchange.com/a/23287
-/*
- * Execute a function "func" on all pairs in range [first, last)
- * Each value combines with every other value. None combine with themselves and symmetric pairings,
- * i.e. function is not executed on the same value and on a symmetric pair (e.g. (1, 2) / (2, 1) )
- */
-template<typename Iter, typename Func>
-void ExecutePairWise(Iter first, Iter last, Func func)
-{
-    for(; first != last; ++first)
+    // Based on https://codereview.stackexchange.com/a/23287
+    /*
+     * Execute a function "func" on all pairs in range [first, last)
+     * Each value combines with every other value. None combine with themselves and symmetric pairings,
+     * i.e. function is not executed on the same value and on a symmetric pair (e.g. (1, 2) / (2, 1) )
+     */
+    template<typename Iter, typename Func>
+    void ExecutePairWise(Iter first, Iter last, Func func)
     {
-        for(Iter next = std::next(first); next != last; ++next)
+        for(; first != last; ++first)
         {
-            func(*first, *next);
+            for(Iter next = std::next(first); next != last; ++next)
+            {
+                func(*first, *next);
+            }
         }
     }
 }

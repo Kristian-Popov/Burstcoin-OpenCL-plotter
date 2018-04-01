@@ -171,3 +171,23 @@ bool PlotFile::IsNameValid( const boost::filesystem::path& filePath )
     std::regex regex( R"(\d+_\d+_\d+_\d+(\.[a-zA-Z]+)?)" );
     return std::regex_match( fileName, regex );
 }
+
+bool PlotFile::operator==( const PlotFile& rhs )
+{
+    return this->BuildCanonicalFilePath() == rhs.BuildCanonicalFilePath();
+}
+
+std::string PlotFile::BuildCanonicalFilePath() const
+{
+    return boost::filesystem::canonical( filePathWithoutSuffix_ ).string();
+}
+
+bool PlotFile::operator!=( const PlotFile& rhs )
+{
+    return !( *this == rhs );
+}
+
+bool PlotFile::operator<( const PlotFile& rhs )
+{
+    return BuildCanonicalFilePath() < rhs.BuildCanonicalFilePath();
+}

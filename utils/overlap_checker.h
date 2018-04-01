@@ -15,13 +15,13 @@ class OverlapChecker
 public:
     static void CheckForNonceOverlaps( const std::vector<std::string>& directories )
     {
-        std::vector<std::unique_ptr<PlotFile>> plotFiles;
+        std::vector<std::shared_ptr<PlotFile>> plotFiles;
         for (const std::string& dir: directories)
         {
             Utils::AppendVectorToVector( plotFiles, PlotFileScanner::Scan( dir ) );
         }
 
-        for ( const std::unique_ptr<PlotFile>& plotFile: plotFiles )
+        for ( const std::shared_ptr<PlotFile>& plotFile: plotFiles )
         {
             BOOST_LOG_TRIVIAL(debug) << "Found plot file at path " << plotFile->FileNameWithPath();
 
@@ -29,26 +29,49 @@ public:
             EXCEPTION_ASSERT( plotFile );
         }
 
-        // TODO remove duplicate plot files (multiple representations of the same plot file)?
-        std::vector<NonceNumRange> overlaps;
-        ExecutePairWise( plotFiles.begin(), plotFiles.end(), [&overlaps]
-        ( const std::unique_ptr<PlotFile>& lhs, const std::unique_ptr<PlotFile>& rhs )
+        std::sort( plotFiles.begin(), plotFiles.end() );
+        plotFiles.erase( std::unique( plotFiles.begin(), plotFiles.end() ), plotFiles.end() );
+
+        // Store information about overlaps and files where they are
+        std::unordered_map<NonceNumRange, std::vector<std::shared_ptr<PlotFile>>> overlapInfo;
+        Utils::ExecutePairWise( plotFiles.begin(), plotFiles.end(), [&overlapInfo]
+        ( std::shared_ptr<PlotFile> lhs, std::shared_ptr<PlotFile> rhs )
         {
             boost::optional<NonceNumRange> possibleOverlap = lhs->CalcNonceRangeIntersectionWith( *rhs );
-            if (possibleOverlap)
+            if ( possibleOverlap )
             {
-                overlaps.push_back( possibleOverlap.value() );
+                std::vector<std::shared_ptr<PlotFile>>& plotFileVector = overlapInfo[possibleOverlap.value()];
+                plotFileVector.push_back( lhs );
+                plotFileVector.push_back( rhs );
             }
         } );
 
-        if (overlaps.empty())
+        // Remove duplicate references to plot files in "overlapInfo"
+        for ( auto& overlap: overlapInfo )
+        {
+            std::vector<std::shared_ptr<PlotFile>>& plotFileVector = overlap.second;
+            std::sort( plotFileVector.begin(), plotFileVector.end() );
+            plotFileVector.erase( std::unique( plotFileVector.begin(), plotFileVector.end() ), plotFileVector.end() );
+        }
+
+        // Log results
+        if ( overlapInfo.empty() )
         {
             BOOST_LOG_TRIVIAL(info) << "No overlaps found";
         }
         else
         {
-            // TODO remove duplicates in overlaps
-            BOOST_LOG_TRIVIAL(error) << "Overlaps found: " << Utils::VectorToString( overlaps );
+            std::stringstream stream;
+            for ( auto& overlap: overlapInfo )
+            {
+                stream << "Overlap found: " << overlap.first << std::endl;
+                for ( const auto& plotFilePtr: overlap.second )
+                {
+                    stream << "\t in file " << plotFilePtr->FileNameWithPath() << std::endl;
+                }
+                BOOST_LOG_TRIVIAL(error) << stream.str();
+                stream.clear();
+            }
         }
     }
 };

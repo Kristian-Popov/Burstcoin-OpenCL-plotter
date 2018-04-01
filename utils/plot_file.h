@@ -9,6 +9,10 @@
 #include "utils.h"
 
 // TODO this class could be greatly implemented using "state" pattern
+/*
+ * TODO we have inconsistencies with suffix since it is not stored in this class but search works on file paths with suffixes.
+ * It would be great to improve it somehow
+ */
 class PlotFile
 {
 public:
@@ -69,6 +73,18 @@ public:
         return params_.nonceNumRange_.CalcIntersectionWith( rhs.Params().nonceNumRange_ );
     }
 
+    /*
+     * Plot files are considered equal if they represent the same file on disk (comparison is done
+     * by comparing canonical file names)
+     */
+    bool operator==( const PlotFile& rhs );
+    bool operator!=( const PlotFile& rhs );
+
+    /*
+     * Doesn't really makes sense but allows sorting
+     */
+    bool operator<( const PlotFile& rhs );
+
     static bool IsNameValid( const boost::filesystem::path& filePath );
 private:
     static constexpr const char* optimizationSuffix_ = ".optimizing";
@@ -89,4 +105,5 @@ private:
     PlotFileParams ExtractParamsFromFilePath( const boost::filesystem::path& filePath );
 
     bool IsValid( const boost::filesystem::path& filePath, bool longValidation );
+    std::string BuildCanonicalFilePath() const;
 };

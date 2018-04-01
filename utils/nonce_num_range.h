@@ -5,6 +5,7 @@
 
 #include <boost/optional.hpp>
 #include <boost/optional/optional_io.hpp>
+#include <typeindex>
 
 class NonceNumRange
 {
@@ -66,5 +67,19 @@ private:
     uint64_t startNonceNum_ = 0;
     uint64_t sizeInNonce_ = 0;
 };
+
+// Specialize std::hash so that NonceNumRange can be used as a key in
+// std::unordered_set and std::unordered_map
+namespace std
+{
+    template <> struct hash<NonceNumRange>
+    {
+        std::size_t operator()( const NonceNumRange& t ) const
+        {
+            // Based on https://stackoverflow.com/a/17017281
+            return t.StartNonceNum() ^ ( t.SizeInNonce() << 1 );
+        }
+    };
+}
 
 std::ostream& operator<< (std::ostream& stream, const NonceNumRange& range);
