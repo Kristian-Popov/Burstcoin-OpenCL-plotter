@@ -63,6 +63,16 @@ public:
     {
         return !( *this == rhs );
     }
+
+    /*
+     * Like a constructor, but builds a class using start and end nonce numbers.
+     */
+    static NonceNumRange ConstructUsingStartAndEnd( uint64_t startNonceNum, uint64_t lastNonceNum )
+    {
+        // TODO move size->last nonce number conversion to a separator function?
+        EXCEPTION_ASSERT( lastNonceNum < ULLONG_MAX ); // If we try to use the last nonce number, we'll get overflow in size value
+        return NonceNumRange( startNonceNum, lastNonceNum - startNonceNum + 1 );
+    }
 private:
     uint64_t startNonceNum_ = 0;
     uint64_t sizeInNonce_ = 0;
@@ -83,3 +93,5 @@ namespace std
 }
 
 std::ostream& operator<< (std::ostream& stream, const NonceNumRange& range);
+
+bool operator<(const NonceNumRange& lhs, const NonceNumRange& rhs);

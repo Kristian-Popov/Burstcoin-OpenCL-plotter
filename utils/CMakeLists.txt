@@ -22,6 +22,7 @@ add_library( utils
 	nonce_num_range.h
 	plot_file_scanner.h
 	overlap_checker.h
+	nonce_num_set.h
 )
 
 target_include_directories (utils PUBLIC ${OpenCL_INCLUDE_DIRS} 

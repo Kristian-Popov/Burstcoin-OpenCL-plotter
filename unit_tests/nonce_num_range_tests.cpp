@@ -125,6 +125,40 @@ TEST_CASE( "CalcIntersectionWith method works as expected", "[NonceNumRange]" )
     }
 }
 
+TEST_CASE( "Comparison of NonceNumRange by operator< works as expected", "[NonceNumRange]" )
+{
+    {
+        NonceNumRange lhs( 1000, 1000 );
+        NonceNumRange rhs( 1000, 20000 );
+        REQUIRE( lhs < rhs );
+    }
+    {
+        NonceNumRange lhs( 2000, 1000 );
+        NonceNumRange rhs( 1000, 20000 );
+        REQUIRE( !( lhs < rhs ) );
+    }
+    {
+        NonceNumRange lhs( 2000, 1000 );
+        NonceNumRange rhs( 1000, 1000 );
+        REQUIRE( !( lhs < rhs ) );
+    }
+    {
+        NonceNumRange lhs( 2000, 2000 );
+        NonceNumRange rhs( 2000, 1000 );
+        REQUIRE( !( lhs < rhs ) );
+    }
+    {
+        NonceNumRange lhs( 1000, 1000 );
+        NonceNumRange rhs( 1000, 1000 );
+        REQUIRE( !( lhs < rhs ) );
+    }
+    {
+        NonceNumRange lhs( 0, 1000 );
+        NonceNumRange rhs( 0, 1000 );
+        REQUIRE( !( lhs < rhs ) );
+    }
+}
+
 TEST_CASE( "NonceNumRange throws an exception in constructor if nonce number overflow will happen", "[NonceNumRange]" )
 {
     REQUIRE_THROWS( NonceNumRange( ULLONG_MAX, 10 ) );
