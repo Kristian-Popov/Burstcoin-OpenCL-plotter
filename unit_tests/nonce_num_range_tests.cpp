@@ -167,3 +167,57 @@ TEST_CASE( "NonceNumRange throws an exception in constructor if nonce number ove
     REQUIRE_THROWS( NonceNumRange( ULLONG_MAX - 1, 3 ) );
     REQUIRE_THROWS( NonceNumRange( ULLONG_MAX - 2, 4 ) );
 }
+
+TEST_CASE( "Split() works as expected", "[NonceNumRange]" )
+{
+    {
+        auto splitResult = NonceNumRange( 0, 10 ).Split( 10 );
+        REQUIRE( splitResult.first == NonceNumRange( 0, 10 ) );
+        REQUIRE( !splitResult.second );
+    }
+    {
+        auto splitResult = NonceNumRange( 0, 1000 ).Split( 1000 );
+        REQUIRE( splitResult.first == NonceNumRange( 0, 1000 ) );
+        REQUIRE( !splitResult.second );
+    }
+    {
+        auto splitResult = NonceNumRange( 100, 100 ).Split( 100 );
+        REQUIRE( splitResult.first == NonceNumRange( 100, 100 ) );
+        REQUIRE( !splitResult.second );
+    }
+    {
+        auto splitResult = NonceNumRange( 100, 100 ).Split( 200 );
+        REQUIRE( splitResult.first == NonceNumRange( 100, 100 ) );
+        REQUIRE( !splitResult.second );
+    }
+    {
+        auto splitResult = NonceNumRange( 0, 1000 ).Split( 2000 );
+        REQUIRE( splitResult.first == NonceNumRange( 0, 1000 ) );
+        REQUIRE( !splitResult.second );
+    }
+    {
+        auto splitResult = NonceNumRange( 0, 100 ).Split( 50 );
+        REQUIRE( splitResult.first == NonceNumRange( 0, 50 ) );
+        REQUIRE( splitResult.second == NonceNumRange( 50, 50 ) );
+    }
+    {
+        auto splitResult = NonceNumRange( 0, 100 ).Split( 1 );
+        REQUIRE( splitResult.first == NonceNumRange( 0, 1 ) );
+        REQUIRE( splitResult.second == NonceNumRange( 1, 99 ) );
+    }
+}
+
+TEST_CASE( "Few sequential calls to Split() works as expected", "[NonceNumRange]" )
+{
+    {
+        auto splitResult1 = NonceNumRange( 0, 100 ).Split( 1 );
+        REQUIRE( splitResult1.first == NonceNumRange( 0, 1 ) );
+        REQUIRE( splitResult1.second == NonceNumRange( 1, 99 ) );
+
+        {
+            auto splitResult2 = splitResult1.second->Split( 1 );
+            REQUIRE( splitResult2.first == NonceNumRange( 1, 1 ) );
+            REQUIRE( splitResult2.second == NonceNumRange( 2, 98 ) );
+        }
+    }
+}

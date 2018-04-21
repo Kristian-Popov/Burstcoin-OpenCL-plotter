@@ -15,3 +15,19 @@ bool operator<(const NonceNumRange& lhs, const NonceNumRange& rhs)
     // If start nonces are equal, smaller nonce has smaller size
     return lhs.SizeInNonce() < rhs.SizeInNonce();
 }
+
+NonceNumRange::SplitResult NonceNumRange::Split( uint64_t preferredSplitSize ) const
+{
+    NonceNumRange::SplitResult result;
+    if ( sizeInNonce_ <= preferredSplitSize )
+    {
+        result.first = *this;
+    }
+    else
+    {
+        result.first = NonceNumRange( startNonceNum_, preferredSplitSize );
+        result.second = NonceNumRange( startNonceNum_ + preferredSplitSize, sizeInNonce_ - preferredSplitSize );
+    }
+    return result;
+}
+

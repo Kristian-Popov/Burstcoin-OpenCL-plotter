@@ -11,6 +11,7 @@
 #include <functional>
 #include <memory>
 #include <unordered_map>
+#include <set>
 
 namespace Utils
 {
@@ -23,6 +24,16 @@ namespace Utils
         std::copy( v.begin(), v.end(), std::ostream_iterator<T>( result, delimiter.c_str() ) );
         return result.str();
     }
+
+    // TODO generalize this somehow?
+    template <typename T>
+    std::string SetToString( const std::set<T>& v, const std::string& delimiter = ", " )
+    {
+        std::stringstream result;
+        std::copy( v.begin(), v.end(), std::ostream_iterator<T>( result, delimiter.c_str() ) );
+        return result.str();
+    }
+
 
     template <typename T>
     void AppendVectorToVector( T& v1, const T& v2 )

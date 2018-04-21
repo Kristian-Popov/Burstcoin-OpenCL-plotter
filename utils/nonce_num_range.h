@@ -65,6 +65,15 @@ public:
     }
 
     /*
+     * Split this range into two.
+     * The result is pair of ranges (second one is optional).
+     * Split is performed in such a way so the first range is as big as possible (up to "preferredSplitSize")
+     * If this range is too small to split in two, the first returned is equal to current one and second one is empty.
+     */
+    typedef std::pair<NonceNumRange, boost::optional<NonceNumRange>> SplitResult;
+    SplitResult Split( uint64_t preferredSplitSize ) const;
+
+    /*
      * Like a constructor, but builds a class using start and end nonce numbers.
      */
     static NonceNumRange ConstructUsingStartAndEnd( uint64_t startNonceNum, uint64_t lastNonceNum )
