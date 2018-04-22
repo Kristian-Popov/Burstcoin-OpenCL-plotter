@@ -74,3 +74,38 @@ TEST_CASE( "Inverse works", "[NonceNumSet]" )
         REQUIRE( *iter == NonceNumRange::ConstructUsingStartAndEnd( 1100, ULLONG_MAX - 1 ) );
     }
 }
+
+TEST_CASE( "CutPieceAtBeginning() works", "[NonceNumSet]" )
+{
+    {
+        NonceNumSet set( {
+            NonceNumRange( 0, 10 )
+        } );
+        REQUIRE( set.CutPieceAtBeginning( 10 ) == NonceNumRange( 0, 10 ) );
+        REQUIRE( set.GetRanges().empty() );
+    }
+    {
+        NonceNumSet set( {
+            NonceNumRange( 0, 10 )
+        } );
+        REQUIRE( set.CutPieceAtBeginning( 20 ) == NonceNumRange( 0, 10 ) );
+        REQUIRE( set.GetRanges().empty() );
+    }
+    {
+        NonceNumSet set( {
+            NonceNumRange( 0, 10 )
+        } );
+        REQUIRE( set.CutPieceAtBeginning( 5 ) == NonceNumRange( 0, 5 ) );
+        REQUIRE( set.CutPieceAtBeginning( 5 ) == NonceNumRange( 5, 5 ) );
+        REQUIRE( set.GetRanges().empty() );
+    }
+    {
+        NonceNumSet set( {
+            NonceNumRange( 10, 100 )
+        } );
+        REQUIRE( set.CutPieceAtBeginning( 5 ) == NonceNumRange( 10, 5 ) );
+        REQUIRE( set.CutPieceAtBeginning( 50 ) == NonceNumRange( 15, 50 ) );
+        REQUIRE( set.CutPieceAtBeginning( 100 ) == NonceNumRange( 65, 45 ) );
+        REQUIRE( set.GetRanges().empty() );
+    }
+}

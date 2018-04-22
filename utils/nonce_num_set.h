@@ -68,6 +68,14 @@ public:
         }
         return NonceNumSet( resultRanges );
     }
+
+    /*
+     * Cut a piece of this set at a beginning and return it, preferrably with "preferredSplitSize" nonces.
+     * Returned nonce range can be smaller than "preferredSplitSize".
+     *
+     * After calling to this method, set is changed and nonces returned in a result range are no longer part of this set.
+     */
+    NonceNumRange CutPieceAtBeginning( uint64_t preferredSplitSize );
 private:
     // We're using a common set here since we need sorted data structure
     std::set<NonceNumRange> ranges_;
