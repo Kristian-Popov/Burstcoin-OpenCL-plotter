@@ -11,6 +11,11 @@
 class NonceNumSet
 {
 public:
+    /*
+     * Construct a set from a series of ranges.
+     * May contain overlapping nonces (but you mustn't call CutPieceAtBeginning() in this case),
+     * but duplicated nonce ranges (exactly identical) are removed
+     */
     explicit NonceNumSet( const std::vector<NonceNumRange>& ranges ) // TODO replace with generic iterators or something else?
         : ranges_( ranges.cbegin(), ranges.cend() )
     {}
@@ -74,9 +79,13 @@ public:
      * Returned nonce range can be smaller than "preferredSplitSize".
      *
      * After calling to this method, set is changed and nonces returned in a result range are no longer part of this set.
+     *
+     * Set must not contain overlapping nonces.
      */
     NonceNumRange CutPieceAtBeginning( uint64_t preferredSplitSize );
 private:
     // We're using a common set here since we need sorted data structure
     std::set<NonceNumRange> ranges_;
+
+    bool AreAnyNoncesOverlapping() const;
 };

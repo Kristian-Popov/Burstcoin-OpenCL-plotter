@@ -18,6 +18,8 @@ bool operator<(const NonceNumRange& lhs, const NonceNumRange& rhs)
 
 NonceNumRange::SplitResult NonceNumRange::Split( uint64_t preferredSplitSize ) const
 {
+    EXCEPTION_ASSERT( preferredSplitSize > 0 );
+
     NonceNumRange::SplitResult result;
     if ( sizeInNonce_ <= preferredSplitSize )
     {

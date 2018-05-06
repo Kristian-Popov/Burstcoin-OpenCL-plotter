@@ -221,3 +221,10 @@ TEST_CASE( "Few sequential calls to Split() works as expected", "[NonceNumRange]
         }
     }
 }
+
+TEST_CASE( "Split() throws if preferredSplitSize is zero", "[NonceNumRange]" )
+{
+    REQUIRE_THROWS( NonceNumRange( 0, 100 ).Split( 0 ) );
+    REQUIRE_THROWS( NonceNumRange( 0, 1000 ).Split( 0 ) );
+    REQUIRE_THROWS( NonceNumRange( 10000, 1000 ).Split( 0 ) );
+}

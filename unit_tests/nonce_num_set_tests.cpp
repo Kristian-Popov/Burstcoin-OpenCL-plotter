@@ -2,6 +2,31 @@
 
 #include "nonce_num_set.h"
 
+TEST_CASE( "Set constructor should remove duplicate ranges", "[NonceNumSet]" )
+{
+    {
+        NonceNumSet set( {
+            NonceNumRange( 0, 10 ),
+            NonceNumRange( 0, 10 ),
+            NonceNumRange( 0, 10 )
+        } );
+        REQUIRE( set.GetRanges().size() == 1 );
+        REQUIRE( *set.GetRanges().cbegin() == NonceNumRange( 0, 10 ) );
+    }
+    {
+        NonceNumSet set( {
+            NonceNumRange( 1000, 10 ),
+            NonceNumRange( 0, 10 ),
+            NonceNumRange( 0, 10 )
+        } );
+        REQUIRE( set.GetRanges().size() == 2 );
+        auto iter = set.GetRanges().cbegin();
+        REQUIRE( *iter == NonceNumRange( 0, 10 ) );
+        ++iter;
+        REQUIRE( *iter == NonceNumRange( 1000, 10 ) );
+    }
+}
+
 TEST_CASE( "Inverse works", "[NonceNumSet]" )
 {
     {
@@ -75,7 +100,7 @@ TEST_CASE( "Inverse works", "[NonceNumSet]" )
     }
 }
 
-TEST_CASE( "CutPieceAtBeginning() works", "[NonceNumSet]" )
+TEST_CASE( "CutPieceAtBeginning() works as expected when there's no overlap", "[NonceNumSet]" )
 {
     {
         NonceNumSet set( {
@@ -107,5 +132,16 @@ TEST_CASE( "CutPieceAtBeginning() works", "[NonceNumSet]" )
         REQUIRE( set.CutPieceAtBeginning( 50 ) == NonceNumRange( 15, 50 ) );
         REQUIRE( set.CutPieceAtBeginning( 100 ) == NonceNumRange( 65, 45 ) );
         REQUIRE( set.GetRanges().empty() );
+    }
+}
+
+TEST_CASE( "CutPieceAtBeginning() throws an exception when there are overlaps in a set", "[NonceNumSet]" )
+{
+    {
+        NonceNumSet set( {
+            NonceNumRange( 0, 10 ),
+            NonceNumRange( 9, 10 )
+        } );
+        REQUIRE_THROWS( set.CutPieceAtBeginning( 10 ) );
     }
 }
