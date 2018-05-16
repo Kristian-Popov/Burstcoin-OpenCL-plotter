@@ -24,6 +24,11 @@ add_library( utils
 	plot_file_scanner.h
 	overlap_checker.h
 	nonce_num_set.h
+	plot_planner.h
+
+	plotters/plotter_interface.h
+	#plotters/mdcct_stub_plotter.h
+	plotters/cryo_gpu_stub_plotter.h
 )
 
 target_include_directories (utils PUBLIC ${OpenCL_INCLUDE_DIRS} 

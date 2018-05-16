@@ -13,7 +13,9 @@
 class OverlapChecker
 {
 public:
-    static void CheckForNonceOverlaps( const std::vector<std::string>& directories )
+    // Check for nonce overlaps. Returns the number of overlapping ranges (i.e. 0 if there are no overlaps,
+    // a bigger number otherwise)
+    static int CheckForNonceOverlaps( const std::vector<std::string>& directories )
     {
         std::vector<std::shared_ptr<PlotFile>> plotFiles;
         for (const std::string& dir: directories)
@@ -58,6 +60,7 @@ public:
         if ( overlapInfo.empty() )
         {
             BOOST_LOG_TRIVIAL(info) << "No overlaps found";
+            return 0;
         }
         else
         {
@@ -72,6 +75,7 @@ public:
                 BOOST_LOG_TRIVIAL(error) << stream.str();
                 stream.clear();
             }
+            return overlapInfo.size();
         }
     }
 };

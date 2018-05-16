@@ -9,6 +9,11 @@ namespace
 
 namespace PlotFileMath
 {
+    uint64_t GetNonceSizeInBytes()
+    {
+        return nonceSizeInBytes_;
+    }
+
     uint64_t CalcStaggerCount( const PlotFileParams & params )
     {
         return params.nonceNumRange_.SizeInNonce() / params.staggerSizeInNonces_;

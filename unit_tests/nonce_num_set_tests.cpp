@@ -145,3 +145,11 @@ TEST_CASE( "CutPieceAtBeginning() throws an exception when there are overlaps in
         REQUIRE_THROWS( set.CutPieceAtBeginning( 10 ) );
     }
 }
+
+TEST_CASE( "CutPieceAtBeginning() throws an exception if set is empty", "[NonceNumSet]" )
+{
+    {
+        NonceNumSet set( {} );
+        REQUIRE_THROWS( set.CutPieceAtBeginning( 10 ) );
+    }
+}

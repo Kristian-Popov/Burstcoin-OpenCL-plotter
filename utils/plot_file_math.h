@@ -5,6 +5,8 @@
 
 namespace PlotFileMath
 {
+    uint64_t GetNonceSizeInBytes();
+
     // Calculate how many staggers are needed to fit the data using supplied parameters
     uint64_t CalcStaggerCount( const PlotFileParams & params );
 

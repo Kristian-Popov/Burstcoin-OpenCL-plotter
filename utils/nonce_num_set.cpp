@@ -2,8 +2,8 @@
 
 NonceNumRange NonceNumSet::CutPieceAtBeginning( uint64_t preferredSplitSize )
 {
-    // TODO make sure that set doesn't have overlaps
     EXCEPTION_ASSERT( !AreAnyNoncesOverlapping() );
+    EXCEPTION_ASSERT( !ranges_.empty() );
 
     NonceNumRange firstRange = *ranges_.cbegin();
     ranges_.erase( ranges_.cbegin() );
