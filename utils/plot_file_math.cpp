@@ -26,9 +26,14 @@ namespace PlotFileMath
         return staggerNum * CalcStaggerSizeInBytes( params );
     }
 
+    uint64_t CalcStaggerSizeInBytes( uint64_t staggerSizeInNonces )
+    {
+        return staggerSizeInNonces * nonceSizeInBytes_;
+    }
+
     uint64_t CalcStaggerSizeInBytes( const PlotFileParams & params )
     {
-        return params.staggerSizeInNonces_ * nonceSizeInBytes_;
+        return CalcStaggerSizeInBytes( params.staggerSizeInNonces_ );
     }
 
     // Calculate in which stagger nonce "nonceNum" is located
@@ -62,5 +67,10 @@ namespace PlotFileMath
     uint64_t CalcPlotFileSize( const PlotFileParams & params )
     {
         return params.nonceNumRange_.SizeInNonce() * nonceSizeInBytes_;
+    }
+
+    uint64_t CalcNonceCountInBytes( uint64_t bytes )
+    {
+        return bytes / nonceSizeInBytes_;
     }
 }

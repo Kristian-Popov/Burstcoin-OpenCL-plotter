@@ -6,8 +6,9 @@
 #include "plot_file.h"
 #include "overlap_checker.h"
 #include "nonce_num_set.h"
+#include "plot_file_math.h"
 
-#include "plotter.h"
+#include "plotters/plotter_interface.h"
 
 #include "plot_file_scanner.h"
 
@@ -52,7 +53,7 @@ public:
         NonceNumSet nonceNumSet = NonceNumSet( ranges ).Inverse();
 
         // Start filling the space
-        uint64_t maxNoncesToFill = maxBytesToFill / PlotFileMath::GetNonceSizeInBytes();
+        uint64_t maxNoncesToFill = PlotFileMath::CalcNonceCountInBytes( maxBytesToFill );
         for ( const std::string& dir: directories )
         {
             BOOST_LOG_TRIVIAL(debug) << "Preparing to fill a directory " << dir;
@@ -65,7 +66,7 @@ public:
             EXCEPTION_ASSERT( maxNoncesToFill >= noncesToFill );
             maxNoncesToFill -= noncesToFill;
 
-            BOOST_LOG_TRIVIAL(debug) << "Will generate " << noncesToFill << "nonces for current directory";
+            BOOST_LOG_TRIVIAL(debug) << "Will generate " << noncesToFill << " nonces for current directory";
 
             while( noncesToFill > 0 )
             {

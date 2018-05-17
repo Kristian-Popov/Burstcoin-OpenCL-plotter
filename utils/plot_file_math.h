@@ -13,7 +13,10 @@ namespace PlotFileMath
     // Calculate an offset to the first byte of the stagger
     uint64_t CalcStaggerStartOffsetInBytes( const PlotFileParams& params, uint64_t staggerNum );
 
+    uint64_t CalcStaggerSizeInBytes( uint64_t staggerSizeInNonces );
     uint64_t CalcStaggerSizeInBytes( const PlotFileParams& params );
+
+    uint64_t CalcNonceCountInBytes( uint64_t bytes );
 
     // Calculate in which stagger nonce "nonceNum" is located
     //uint64_t CalcStaggerNum( const PlotFileParams& params, uint64_t nonceNum );
