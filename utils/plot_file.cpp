@@ -16,6 +16,7 @@ PlotFile::PlotFile( const PlotFileParams & params, const boost::filesystem::path
 {
     EXCEPTION_ASSERT( boost::filesystem::exists( directory ) &&
         boost::filesystem::is_directory( directory ) );
+    EXCEPTION_ASSERT( params.staggerSizeInNonces_ > 0 );
     params_ = params;
     boost::filesystem::path filePath = directory /
         BuildFileNameWithoutSuffix();

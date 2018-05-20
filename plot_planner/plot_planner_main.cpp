@@ -18,7 +18,15 @@
 std::shared_ptr<PlotterInterface> PrepareCryoStubPlotter( const std::string& strategy, uint64_t staggerSizeInBytes )
 {
     std::shared_ptr<CryoGPUStubPlotter> plotter = std::make_shared<CryoGPUStubPlotter>();
-    plotter->SetParameters( strategy, PlotFileMath::CalcNonceCountInBytes( staggerSizeInBytes ) );
+    uint64_t staggerSizeInNonces = PlotFileMath::CalcNonceCountInBytes( staggerSizeInBytes );
+    if ( staggerSizeInBytes == 0 || staggerSizeInNonces == 0  )
+    {
+        BOOST_LOG_TRIVIAL( fatal ) << "Stagger size is either 0 or too small to host at least one nonce, it should be at least " <<
+            PlotFileMath::GetNonceSizeInBytes() <<
+            " bytes, but preferrably 70-80% of available RAM";
+        throw std::logic_error( "Supplied stagger size is too small" );
+    }
+    plotter->SetParameters( strategy, staggerSizeInNonces );
     return plotter;
 }
 
@@ -29,11 +37,14 @@ int main( int argc, char** argv )
     const static uint64_t defaultMaxBytesVal = ULLONG_MAX;
 
     boost::program_options::options_description desc( "Allowed options" );
+
+    uint64_t maxBytes = 0;
+
     desc.add_options()
         ( "help,h", "produce help message" )
-        ( "directory,d", po::value<std::vector<std::string>>(), "directory where plot files can be found" )
+        ( "directory,d", po::value<std::vector<std::string>>()->composing(), "directory where plot files can be found" )
         ( "id,k", po::value<uint64_t>(), "account numeric ID" )
-        ( "max-bytes,b", po::value<uint64_t>()->default_value( defaultMaxBytesVal ),
+        ( "max-bytes,b", po::value<uint64_t>( &maxBytes )->default_value( defaultMaxBytesVal ),
             "how much bytes to fill in total in all folders. If not given, all free space will be filled" )
         ( "stagger-size,s", po::value<uint64_t>(), "stagger size in bytes (determines used RAM to a large extent)" )
         ( "strategy", po::value<std::string>(), "strategy used by Cryo's GPU miner. Valid values: buffer and direct" )
@@ -73,17 +84,13 @@ int main( int argc, char** argv )
         log::severity >= ( vm.count( "verbose" ) > 0 ? log::severity_level::trace : log::severity_level::info )
     );
 
-    std::vector<std::string> directories = vm["directory"].as<std::vector<std::string>>();
-    if (directories.empty())
+    if( vm.count( "directory" ) == 0 )
     {
         BOOST_LOG_TRIVIAL( fatal ) << "No directories to fill are given, exiting";
         return EXIT_FAILURE;
     }
-
-    uint64_t accountNumericId = vm["id"].as<uint64_t>();
-    uint64_t maxBytes = vm["max-bytes"].as<uint64_t>();
-    uint64_t staggerSizeInBytes = vm["stagger-size"].as<uint64_t>();
-    std::string strategy = vm["strategy"].as<std::string>();
+    std::vector<std::string> directories = vm["directory"].as<std::vector<std::string>>();
+    EXCEPTION_ASSERT( !directories.empty() );
 
     if ( maxBytes == defaultMaxBytesVal )
     {
@@ -95,6 +102,28 @@ int main( int argc, char** argv )
         BOOST_LOG_TRIVIAL(info) << "Filling up to " << maxBytes << " bytes of space";
     }
 
+    if( vm.count( "id" ) != 1 )
+    {
+        BOOST_LOG_TRIVIAL( fatal ) << "id parameter is missing or duplicated";
+        std::cout << desc;
+        return EXIT_FAILURE;
+    }
+    if( vm.count( "stagger-size" ) != 1 )
+    {
+        BOOST_LOG_TRIVIAL( fatal ) << "stagger-size parameter is missing or duplicated";
+        std::cout << desc;
+        return EXIT_FAILURE;
+    }
+    if( vm.count( "strategy" ) != 1 )
+    {
+        BOOST_LOG_TRIVIAL( fatal ) << "strategy parameter is missing or duplicated";
+        std::cout << desc;
+        return EXIT_FAILURE;
+    }
+    uint64_t accountNumericId = vm["id"].as<uint64_t>();
+    uint64_t staggerSizeInBytes = vm["stagger-size"].as<uint64_t>();
+    std::string strategy = vm["strategy"].as<std::string>();
+
     std::shared_ptr<PlotterInterface> plotter = PrepareCryoStubPlotter( strategy, staggerSizeInBytes );
 
     try
@@ -104,12 +133,12 @@ int main( int argc, char** argv )
     catch(std::exception& e)
     {
         BOOST_LOG_TRIVIAL( fatal ) << "Caught fatal exception: " << e.what();
-        return EXIT_FAILURE;
+        throw; // Rethrow error to simplify debugging
     }
     catch(...)
     {
         BOOST_LOG_TRIVIAL( fatal ) << "Caught fatal error";
-        return EXIT_FAILURE;
+        throw; // Rethrow error to simplify debugging
     }
 
     return EXIT_SUCCESS;

@@ -61,7 +61,7 @@ public:
             boost::filesystem::path dirPath = dir;
             boost::filesystem::space_info spaceInfo = boost::filesystem::space( dirPath );
             EXCEPTION_ASSERT( spaceInfo.available != -1 );
-            uint64_t spaceAvailableForThisManyNonces = spaceInfo.available;
+            uint64_t spaceAvailableForThisManyNonces = PlotFileMath::CalcNonceCountInBytes( spaceInfo.available );
             uint64_t noncesToFill = std::min( spaceAvailableForThisManyNonces, maxNoncesToFill );
             EXCEPTION_ASSERT( maxNoncesToFill >= noncesToFill );
             maxNoncesToFill -= noncesToFill;
@@ -70,11 +70,13 @@ public:
 
             while( noncesToFill > 0 )
             {
+                // TODO if we get our range shrinked due to fitting to stagger, we get holes because
+                // "range is already removed from "nonceNumSet", hole appears - [new range end + 1, original range end]
                 NonceNumRange range = nonceNumSet.CutPieceAtBeginning( noncesToFill );
                 EXCEPTION_ASSERT( range.SizeInNonce() <= noncesToFill );
-                noncesToFill -= range.SizeInNonce();
 
-                plotter->Plot( dir, accountNumericId, range );
+                NonceNumRange newRange = plotter->Plot( dir, accountNumericId, range );
+                noncesToFill -= newRange.SizeInNonce();
             }
         }
 

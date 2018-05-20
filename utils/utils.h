@@ -156,4 +156,16 @@ namespace Utils
     }
 }
 
-#define EXCEPTION_ASSERT(expr) { if(!(expr)) { throw std::logic_error("Assert \"" #expr "\" failed"); } }
+// Based on https://stackoverflow.com/a/24964437
+
+template <typename ...Args>
+void realdbgassert(const char *msg, const char *file, int line, Args ... args)
+{
+    std::stringstream stream;
+    stream << "Assertion failed! " << std::endl << "File " << file << ", Line " << line << std::endl
+       << "  Expression: " << msg;
+    throw std::logic_error( stream.str() );
+}
+
+#define EXCEPTION_ASSERT(expr,...) \
+    (void)((expr) || (realdbgassert (#expr, __FILE__, __LINE__, ##__VA_ARGS__),0))
