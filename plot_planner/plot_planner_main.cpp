@@ -32,10 +32,9 @@ uint64_t CalcMaxStaggerSizeInNonces( uint64_t staggerSizeInBytes )
     return staggerSizeInNonces;
 }
 
-std::shared_ptr<PlotterInterface> PrepareCryoStubPlotter( const std::string& strategy )
+std::shared_ptr<PlotterInterface> PrepareCryoStubPlotter()
 {
     std::shared_ptr<CryoGPUStubPlotter> plotter = std::make_shared<CryoGPUStubPlotter>();
-    plotter->SetParameters( strategy );
     return plotter;
 }
 
@@ -48,6 +47,7 @@ int main( int argc, char** argv )
     boost::program_options::options_description desc( "Allowed options" );
 
     uint64_t maxBytes = 0;
+    std::string tempDirectory;
 
     desc.add_options()
         ( "help,h", "produce help message" )
@@ -56,7 +56,10 @@ int main( int argc, char** argv )
         ( "max-bytes,b", po::value<uint64_t>( &maxBytes )->default_value( defaultMaxBytesVal ),
             "how much bytes to fill in total in all folders. If not given, all free space will be filled" )
         ( "stagger-size,s", po::value<uint64_t>(), "stagger size in bytes (determines used RAM to a large extent)" )
-        ( "strategy", po::value<std::string>(), "strategy used by Cryo's GPU miner. Valid values: buffer and direct" )
+        ( "force-direct-mode", "force direct plotting mode (as in Cryo's GPU miner). Causes a lot "
+        " of IO operations on disk, but doesn't require temporary storage and optimization." )
+        ( "temp-dir,t", po::value<std::string>( &tempDirectory ), "temporary storage for unoptimized plots. "
+        "Ignored if direct mode is forced" )
         ( "verbose,v", "write debug output. If given, much more output is written" )
         ;
 
@@ -123,21 +126,17 @@ int main( int argc, char** argv )
         std::cout << desc;
         return EXIT_FAILURE;
     }
-    if( vm.count( "strategy" ) != 1 )
-    {
-        BOOST_LOG_TRIVIAL( fatal ) << "strategy parameter is missing or duplicated";
-        std::cout << desc;
-        return EXIT_FAILURE;
-    }
+
     uint64_t accountNumericId = vm["id"].as<uint64_t>();
     uint64_t staggerSizeInBytes = vm["stagger-size"].as<uint64_t>();
-    std::string strategy = vm["strategy"].as<std::string>();
+    bool forceDirectMode = vm.count( "force-direct-mode" ) > 0;
 
-    std::shared_ptr<PlotterInterface> plotter = PrepareCryoStubPlotter( strategy );
+    std::shared_ptr<PlotterInterface> plotter = PrepareCryoStubPlotter();
 
     try
     {
-        PlotPlanner::FillSpace( plotter, accountNumericId, directories, CalcMaxStaggerSizeInNonces( staggerSizeInBytes ), maxBytes );
+        PlotPlanner::FillSpace( plotter, accountNumericId, directories, CalcMaxStaggerSizeInNonces( staggerSizeInBytes ),
+            forceDirectMode, maxBytes );
     }
     catch(std::exception& e)
     {

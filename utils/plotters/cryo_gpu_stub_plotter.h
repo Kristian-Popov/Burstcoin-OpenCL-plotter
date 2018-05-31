@@ -9,16 +9,26 @@
 class CryoGPUStubPlotter final: public PlotterInterface
 {
 public:
-    void SetParameters( const std::string& strategy )
-    {
-        strategy_ = strategy;
-    }
-
-    NonceNumRange Plot( const std::string& directory, const PlotFileParams& params ) override
+    NonceNumRange Plot( const std::string& directory, const PlotFileParams& params, PlottingMode mode ) override
     {
         PlotFile plotFile( params, directory );
+
+        std::string strategy;
+        switch ( mode )
+        {
+            case PlottingMode::Buffer:
+                strategy = "buffer";
+                break;
+            case PlottingMode::Direct:
+                strategy = "direct";
+                break;
+            default:
+                throw std::logic_error( "Unsupported plotting mode" );
+                break;
+        }
+
         std::string command = ( boost::format( "./gpuPlotGenerator generate %s %s" ) %
-            strategy_ %
+            strategy %
             plotFile.FileNameWithPath() ).str();
         BOOST_LOG_TRIVIAL(info) << "Starting Cryo's GPU plotter, command line: " << command;
         int returnCode = system( command.c_str() );
@@ -32,7 +42,4 @@ public:
         }
         return params.nonceNumRange_;
     }
-
-private:
-    std::string strategy_;
 };

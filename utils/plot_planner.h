@@ -23,8 +23,11 @@ public:
         uint64_t accountNumericId,
         const std::vector<std::string>& directories,
         uint64_t maxStaggerSizeInNonces,
+        bool forceDirectMode,
         uint64_t maxBytesToFill = ULLONG_MAX )
     {
+        EXCEPTION_ASSERT( forceDirectMode ); // Buffer mode is not supported yet
+
         int overlapCount = OverlapChecker::CheckForNonceOverlaps( directories );
         if ( overlapCount > 0 )
         {
@@ -76,17 +79,20 @@ public:
                 uint64_t noncesToFillOnThisIteration = noncesToFill;
                 uint64_t nonceNotFittingInStagger = noncesToFillOnThisIteration % maxStaggerSizeInNonces;
                 uint64_t staggerSizeInNonces = maxStaggerSizeInNonces;
+                PlottingMode mode;
                 if ( nonceNotFittingInStagger > 0 )
                 {
-                    // If nonce count is smaller than stagger, just use it
+                    // If nonce count is smaller than stagger, just use it. Plus we can use direct mode
                     if ( noncesToFillOnThisIteration < maxStaggerSizeInNonces )
                     {
                         staggerSizeInNonces = noncesToFillOnThisIteration;
+                        mode = PlottingMode::Direct;
                     }
                     else
                     {
                         // Decrease range size if it doesn't fit stagger perfectly
                         noncesToFillOnThisIteration -= nonceNotFittingInStagger;
+                        mode = forceDirectMode ? PlottingMode::Direct : PlottingMode::Buffer;
                     }
                 }
 
@@ -94,7 +100,7 @@ public:
                 EXCEPTION_ASSERT( range.SizeInNonce() <= noncesToFillOnThisIteration );
 
                 PlotFileParams params( accountNumericId, range, staggerSizeInNonces );
-                NonceNumRange newRange = plotter->Plot( dir, params );
+                NonceNumRange newRange = plotter->Plot( dir, params, mode );
                 noncesToFill -= newRange.SizeInNonce();
                 EXCEPTION_ASSERT( range == newRange );
                 // Currently new range returned by Plot() must be the same as starting one
