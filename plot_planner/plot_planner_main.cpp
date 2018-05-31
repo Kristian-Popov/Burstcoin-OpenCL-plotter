@@ -15,9 +15,8 @@
 #include "plotters/cryo_gpu_stub_plotter.h"
 #include "plot_file_math.h"
 
-std::shared_ptr<PlotterInterface> PrepareCryoStubPlotter( const std::string& strategy, uint64_t staggerSizeInBytes )
+uint64_t CalcMaxStaggerSizeInNonces( uint64_t staggerSizeInBytes )
 {
-    std::shared_ptr<CryoGPUStubPlotter> plotter = std::make_shared<CryoGPUStubPlotter>();
     uint64_t staggerSizeInNonces = PlotFileMath::CalcNonceCountInBytes( staggerSizeInBytes );
     if ( staggerSizeInBytes == 0 || staggerSizeInNonces == 0  )
     {
@@ -26,7 +25,17 @@ std::shared_ptr<PlotterInterface> PrepareCryoStubPlotter( const std::string& str
             " bytes, but preferrably 70-80% of available RAM";
         throw std::logic_error( "Supplied stagger size is too small" );
     }
-    plotter->SetParameters( strategy, staggerSizeInNonces );
+    else
+    {
+        BOOST_LOG_TRIVIAL( debug ) << "Stagger size is  " << staggerSizeInNonces << " nonces";
+    }
+    return staggerSizeInNonces;
+}
+
+std::shared_ptr<PlotterInterface> PrepareCryoStubPlotter( const std::string& strategy )
+{
+    std::shared_ptr<CryoGPUStubPlotter> plotter = std::make_shared<CryoGPUStubPlotter>();
+    plotter->SetParameters( strategy );
     return plotter;
 }
 
@@ -124,11 +133,11 @@ int main( int argc, char** argv )
     uint64_t staggerSizeInBytes = vm["stagger-size"].as<uint64_t>();
     std::string strategy = vm["strategy"].as<std::string>();
 
-    std::shared_ptr<PlotterInterface> plotter = PrepareCryoStubPlotter( strategy, staggerSizeInBytes );
+    std::shared_ptr<PlotterInterface> plotter = PrepareCryoStubPlotter( strategy );
 
     try
     {
-        PlotPlanner::FillSpace( plotter, accountNumericId, directories, maxBytes );
+        PlotPlanner::FillSpace( plotter, accountNumericId, directories, CalcMaxStaggerSizeInNonces( staggerSizeInBytes ), maxBytes );
     }
     catch(std::exception& e)
     {

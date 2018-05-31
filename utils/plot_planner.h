@@ -22,6 +22,7 @@ public:
     static void FillSpace( const std::shared_ptr<PlotterInterface>& plotter,
         uint64_t accountNumericId,
         const std::vector<std::string>& directories,
+        uint64_t maxStaggerSizeInNonces,
         uint64_t maxBytesToFill = ULLONG_MAX )
     {
         int overlapCount = OverlapChecker::CheckForNonceOverlaps( directories );
@@ -66,17 +67,37 @@ public:
             EXCEPTION_ASSERT( maxNoncesToFill >= noncesToFill );
             maxNoncesToFill -= noncesToFill;
 
+            BOOST_LOG_TRIVIAL(debug) << "I'm still allowed to fill " << maxNoncesToFill << " nonces";
+            BOOST_LOG_TRIVIAL(debug) << "Current directory has space for " << spaceAvailableForThisManyNonces << " nonces";
             BOOST_LOG_TRIVIAL(debug) << "Will generate " << noncesToFill << " nonces for current directory";
 
             while( noncesToFill > 0 )
             {
-                // TODO if we get our range shrinked due to fitting to stagger, we get holes because
-                // "range is already removed from "nonceNumSet", hole appears - [new range end + 1, original range end]
-                NonceNumRange range = nonceNumSet.CutPieceAtBeginning( noncesToFill );
-                EXCEPTION_ASSERT( range.SizeInNonce() <= noncesToFill );
+                uint64_t noncesToFillOnThisIteration = noncesToFill;
+                uint64_t nonceNotFittingInStagger = noncesToFillOnThisIteration % maxStaggerSizeInNonces;
+                uint64_t staggerSizeInNonces = maxStaggerSizeInNonces;
+                if ( nonceNotFittingInStagger > 0 )
+                {
+                    // If nonce count is smaller than stagger, just use it
+                    if ( noncesToFillOnThisIteration < maxStaggerSizeInNonces )
+                    {
+                        staggerSizeInNonces = noncesToFillOnThisIteration;
+                    }
+                    else
+                    {
+                        // Decrease range size if it doesn't fit stagger perfectly
+                        noncesToFillOnThisIteration -= nonceNotFittingInStagger;
+                    }
+                }
 
-                NonceNumRange newRange = plotter->Plot( dir, accountNumericId, range );
+                NonceNumRange range = nonceNumSet.CutPieceAtBeginning( noncesToFillOnThisIteration );
+                EXCEPTION_ASSERT( range.SizeInNonce() <= noncesToFillOnThisIteration );
+
+                PlotFileParams params( accountNumericId, range, staggerSizeInNonces );
+                NonceNumRange newRange = plotter->Plot( dir, params );
                 noncesToFill -= newRange.SizeInNonce();
+                EXCEPTION_ASSERT( range == newRange );
+                // Currently new range returned by Plot() must be the same as starting one
             }
         }
 

@@ -1,7 +1,11 @@
 #pragma once
 
+#include "utils/plot_file_params.h"
+
 class PlotterInterface
 {
 public:
-    virtual NonceNumRange Plot( const std::string& directory, uint64_t accountNumericId, const NonceNumRange& range ) = 0;
+    virtual NonceNumRange Plot(
+        const std::string& directory,
+        const PlotFileParams& params ) = 0;
 };
