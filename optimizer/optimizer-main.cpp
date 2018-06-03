@@ -92,7 +92,10 @@ int main( int argc, char** argv )
         
         for (const std::string& inputFilePath: inputFiles)
         {
-            Optimizer::Optimize( inputFilePath, outputDir );
+            Optimizer::Optimize(
+                boost::filesystem::canonical( inputFilePath ),
+                boost::filesystem::canonical( outputDir )
+            );
         }
     }
     catch(std::exception& e)

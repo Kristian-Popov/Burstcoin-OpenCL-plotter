@@ -58,7 +58,7 @@ public:
         return params_;
     }
     
-    std::string FileNameWithPath()
+    std::string FileNameWithPath() const
     {
 		return BuildFilePathWithSuffix();
 	}
@@ -85,6 +85,12 @@ public:
      */
     bool operator<( const PlotFile& rhs );
 
+    bool DoesItBelongToDirectory( const boost::filesystem::path& directory ) const;
+
+    bool IsFullyOptimized() const;
+
+    static std::string BuildPlotFileNameForParams( const PlotFileParams& params );
+
     static bool IsNameValid( const boost::filesystem::path& filePath );
 private:
     static constexpr const char* optimizationSuffix_ = ".optimizing";
@@ -100,7 +106,7 @@ private:
 
     std::string BuildFileNameWithoutSuffix();
 
-    std::string BuildFilePathWithSuffix( const std::string& suffix = "" );
+    std::string BuildFilePathWithSuffix( const std::string& suffix = "" ) const;
 
     PlotFileParams ExtractParamsFromFilePath( const boost::filesystem::path& filePath );
 

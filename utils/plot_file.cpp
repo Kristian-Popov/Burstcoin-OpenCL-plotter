@@ -119,15 +119,12 @@ inline void PlotFile::Initialize( const boost::filesystem::path & filePath )
 
 inline std::string PlotFile::BuildFileNameWithoutSuffix()
 {
-    return ( boost::format( "%d_%d_%d_%d" ) % 
-        params_.accountNumericId_ % 
-        params_.nonceNumRange_.StartNonceNum() %
-        params_.nonceNumRange_.SizeInNonce() %
-        params_.staggerSizeInNonces_ ).str();
+    return BuildPlotFileNameForParams( params_ );
 }
 
-std::string PlotFile::BuildFilePathWithSuffix( const std::string& suffix /* = "" */ )
+std::string PlotFile::BuildFilePathWithSuffix( const std::string& suffix /* = "" */ ) const
 {
+    // TODO use BuildCanonicalFilePath()?
     return filePathWithoutSuffix_.string() + suffix;
 }
 
@@ -191,4 +188,24 @@ bool PlotFile::operator!=( const PlotFile& rhs )
 bool PlotFile::operator<( const PlotFile& rhs )
 {
     return BuildCanonicalFilePath() < rhs.BuildCanonicalFilePath();
+}
+
+// TODO test it somehow?
+bool PlotFile::DoesItBelongToDirectory( const boost::filesystem::path& directory ) const
+{
+    return !boost::filesystem::relative( FileNameWithPath(), boost::filesystem::canonical( directory ) ).empty();
+}
+
+bool PlotFile::IsFullyOptimized() const
+{
+    return params_.nonceNumRange_.SizeInNonce() == params_.staggerSizeInNonces_;
+}
+
+std::string PlotFile::BuildPlotFileNameForParams( const PlotFileParams& params )
+{
+    return ( boost::format( "%d_%d_%d_%d" ) %
+        params.accountNumericId_ %
+        params.nonceNumRange_.StartNonceNum() %
+        params.nonceNumRange_.SizeInNonce() %
+        params.staggerSizeInNonces_ ).str();
 }

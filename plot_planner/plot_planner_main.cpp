@@ -131,11 +131,19 @@ int main( int argc, char** argv )
     uint64_t staggerSizeInBytes = vm["stagger-size"].as<uint64_t>();
     bool forceDirectMode = vm.count( "force-direct-mode" ) > 0;
 
+    if ( !forceDirectMode && ( vm.count( "temp-dir" ) != 1 ) )
+    {
+        BOOST_LOG_TRIVIAL( fatal ) << "temp-dir parameter is missing or duplicated";
+        std::cout << desc;
+        return EXIT_FAILURE;
+    }
+
     std::shared_ptr<PlotterInterface> plotter = PrepareCryoStubPlotter();
 
     try
     {
         PlotPlanner::FillSpace( plotter, accountNumericId, directories, CalcMaxStaggerSizeInNonces( staggerSizeInBytes ),
+            boost::filesystem::canonical( tempDirectory ),
             forceDirectMode, maxBytes );
     }
     catch(std::exception& e)
