@@ -124,20 +124,21 @@ public:
                 uint64_t nonceNotFittingInStagger = noncesToFillOnThisIteration % maxStaggerSizeInNonces;
                 uint64_t staggerSizeInNonces = maxStaggerSizeInNonces;
                 PlottingMode mode = forceDirectMode ? PlottingMode::Direct : PlottingMode::Buffer;
+                std::string targetDirectory = forceDirectMode ? dir : tempDirectory.string();
                 if ( nonceNotFittingInStagger > 0 )
                 {
                     // If nonce count is smaller than stagger, just use it. Plus we can use direct mode
                     if ( noncesToFillOnThisIteration < maxStaggerSizeInNonces )
                     {
+                        // Force direct mode for this file
                         staggerSizeInNonces = noncesToFillOnThisIteration;
                         mode = PlottingMode::Direct;
-                        // TODO plot directly to destination folder
+                        targetDirectory = dir;
                     }
                     else
                     {
                         // Decrease range size if it doesn't fit stagger perfectly
                         noncesToFillOnThisIteration -= nonceNotFittingInStagger;
-                        // TODO plot to temporary storage
                     }
                 }
 
@@ -145,12 +146,22 @@ public:
                 EXCEPTION_ASSERT( range.SizeInNonce() <= noncesToFillOnThisIteration );
 
                 PlotFileParams params( accountNumericId, range, staggerSizeInNonces );
-                NonceNumRange newRange = plotter->Plot( dir, params, mode );
+                NonceNumRange newRange = plotter->Plot( targetDirectory, params, mode );
                 noncesToFill -= newRange.SizeInNonce();
                 EXCEPTION_ASSERT( range == newRange );
                 // Currently new range returned by Plot() must be the same as starting one
 
-                // TODO if plottig was done to temporary storage and we're not filling temp storage, optimize it
+                // If we're not filling temporary storage (as in last stage) and we weren't using direct mode,
+                // optimize file from temporary storage to normal folder ("dir")
+                if( targetDirectory == tempDirectory.string() && dir != targetDirectory )
+                {
+                    auto plotFile = std::make_shared<PlotFile>( params, dir );
+                    BOOST_LOG_TRIVIAL( info ) << "Optimizing file " << plotFile->FileNameWithPath() << " in temporary storage "
+                        " to directory " << dir;
+
+                    Optimizer::Optimize( plotFile, dir );
+                }
+
             }
         }
     }
