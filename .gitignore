@@ -30,3 +30,6 @@
 .exe
 .out
 .app
+
+# Version file is updated automatically after every commit
+utils/version.cpp
