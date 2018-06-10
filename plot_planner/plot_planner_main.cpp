@@ -14,6 +14,7 @@
 #include "plot_planner.h"
 #include "plotters/cryo_gpu_stub_plotter.h"
 #include "plot_file_math.h"
+#include "version.h"
 
 uint64_t CalcMaxStaggerSizeInNonces( uint64_t staggerSizeInBytes )
 {
@@ -61,6 +62,7 @@ int main( int argc, char** argv )
         ( "temp-dir,t", po::value<std::string>( &tempDirectory ), "temporary storage for unoptimized plots. "
         "Ignored if direct mode is forced" )
         ( "verbose,v", "write debug output. If given, much more output is written" )
+        ( "version", "print program version" )
         ;
 
     po::positional_options_description p;
@@ -88,6 +90,12 @@ int main( int argc, char** argv )
     if( vm.count( "help" ) )
     {
         std::cout << desc;
+        return EXIT_FAILURE;
+    }
+
+    if( vm.count( "version" ) )
+    {
+        std::cout << "Version is " << Version::version << std::endl;
         return EXIT_FAILURE;
     }
 

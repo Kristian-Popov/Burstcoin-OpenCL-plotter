@@ -1,0 +1,8 @@
+#!/bin/bash
+# Update version
+
+# Redirect output to stderr.
+exec 1>&2
+
+# Making cd here is a bad idea
+scripts/update-version.sh

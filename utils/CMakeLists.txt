@@ -14,6 +14,7 @@ add_library( utils
 	plot_file.cpp
 	nonce_num_range.cpp
 	nonce_num_set.cpp
+	version.cpp
 
 	plot_file.h
 	plot_file_params.h
