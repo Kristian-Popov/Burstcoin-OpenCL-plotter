@@ -9,5 +9,8 @@ VERSION=`git --git-dir .git --work-tree . describe --tags --long --always`
 # Add current branch to VERSION
 VERSION="$VERSION-`git rev-parse --abbrev-ref HEAD`"
 
-echo "Updating version to $VERSION"
-sed --in-place -e "s/^const char\* const version = \".*\";$/const char\* const version = \"$VERSION\";/g" utils/version.cpp
+VERSION_FILE=utils/version.cpp
+
+echo "Updating version to $VERSION in file $VERSION_FILE"
+cp $VERSION_FILE.tmpl $VERSION_FILE
+sed --in-place -e "s/^const char\* const version = \".*\";$/const char\* const version = \"$VERSION\";/g" $VERSION_FILE
