@@ -103,3 +103,15 @@ script:
     # Compare files
     - pushd result-files
     - find . -type f -exec cmp {} ../expected-result-files/{} \;
+deploy:
+  provider: releases
+  api_key:
+    secure: pSRuOn3yL7dUxWAmTHDtWQAdZ1jZZttWqQgY8U+eFSD1I+2oWFBm/N5MQLRd/zu1v+DJpSm723iKAbashUflkvCHmZjl97GGL8yRGYmECUBT13YONYj0BbLLy/sVvnqef/Z40lF6kqrJjmuiJjLPfIDXsLTf9X5N9xS5dsWOAKKKUX7HKadsJp8XYc2+xsdkQhkbONE3Dps50N1grXY3qAwhC8M15jli40z6gNLoBJIaHK/nPT7VNvf0qoPavI27eeLt7/dVH0m+InEytzJHI4fkaijbr/RppVay19Pv9i4G887pSIdAiBG5Gm8GLicM6ad4Tk+49FL23JZWTO1RcZDNYZHpVQdzgiEpN8LD/KsB3Y7ApRsayTnHKPIo5VPUozbkuali/T18vo6jLwBpUJL+piFOZ/C1mCX1+WBzukOUZzD9oPfLAmcqNg4PaNbZp03/V4jzsdei2HvdFCg0QK1p+LGn1tMoXhMZkus0x8r56ZAeplQRxofaJmAaq674VfQDfagFG+LkOOwfRLvj9NIb6C1TzC1lPGPn/d/iMepDtxmBXxytQAVzCyvM84OVGeUu/2y0rz/9HSH7ki+E9ZyIobtccW4eOGRf8f+tMCW53Ej75KyGx6o6i+kGBs/pKyFvHFTS+C/bIuQic/ToX0/DO4eIzp6cmkRIvNV9mCI=
+  file:
+    - build/plot_planner/burstcoin-plot-planner
+    - build/optimizer/burstcoin-optimizer
+    - build/overlap_checker/burstcoin-overlap-checker
+  skip_cleanup: true
+  on:
+    - repo: Kristian-Popov/Burstcoin-OpenCL-plotter
+    - tags: true
