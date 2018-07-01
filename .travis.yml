@@ -66,37 +66,40 @@ install:
     - popd
 
 script:
+    # Setup hooks and update version
+    - ./setup-hooks.sh
+    - scripts/update-version.sh
     # Build all tools and unit tests
-     - echo "Building all tools and unit tests"
-     - mkdir -p build
-     - pushd build
-     - cmake ${CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DBOOST_ROOT="../boost_1_65_1" ..
-     - make
-     # Run unit tests
-     - echo "Running unit tests"
-     - ./unit_tests/unit_tests
-     # Compile mdcct
-     - git clone https://github.com/Mirkic7/mdcct.git mdcct
-     - pushd mdcct
-     - make
-     - popd
-     # Build source files for optimizer
-     - mkdir -p source-files
-     - KEY=1
-     - STARTNONCE=0
-     - NONCE_COUNT=40
-     - ./mdcct/plot -k ${KEY} -s ${STARTNONCE} -n ${NONCE_COUNT} -d source-files -m 1 -t ${NUM_THREADS}
-     # Compile omdcct
-     - git clone https://github.com/Kristian-Popov/omdcct.git omdcct
-     - pushd omdcct
-     - make
-     - popd
-     # Build correct result files using an omdcct
-     - mkdir -p expected-result-files
-     - ./omdcct/plot -k ${KEY} -s ${STARTNONCE} -n ${NONCE_COUNT} -d expected-result-files -t ${NUM_THREADS}
-     # Optimize files using our optimizer
-     - mkdir -p result-files
-     - ./optimizer/burstcoin-optimizer "source-files/${KEY}_${STARTNONCE}_${NONCE_COUNT}_1" -o result-files
-     # Compare files
-     - pushd result-files
-     - find . -type f -exec cmp {} ../expected-result-files/{} \;
+    - echo "Building all tools and unit tests"
+    - mkdir -p build
+    - pushd build
+    - cmake ${CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DBOOST_ROOT="../boost_1_65_1" ..
+    - make
+    # Run unit tests
+    - echo "Running unit tests"
+    - ./unit_tests/unit_tests
+    # Compile mdcct
+    - git clone https://github.com/Mirkic7/mdcct.git mdcct
+    - pushd mdcct
+    - make
+    - popd
+    # Build source files for optimizer
+    - mkdir -p source-files
+    - KEY=1
+    - STARTNONCE=0
+    - NONCE_COUNT=40
+    - ./mdcct/plot -k ${KEY} -s ${STARTNONCE} -n ${NONCE_COUNT} -d source-files -m 1 -t ${NUM_THREADS}
+    # Compile omdcct
+    - git clone https://github.com/Kristian-Popov/omdcct.git omdcct
+    - pushd omdcct
+    - make
+    - popd
+    # Build correct result files using an omdcct
+    - mkdir -p expected-result-files
+    - ./omdcct/plot -k ${KEY} -s ${STARTNONCE} -n ${NONCE_COUNT} -d expected-result-files -t ${NUM_THREADS}
+    # Optimize files using our optimizer
+    - mkdir -p result-files
+    - ./optimizer/burstcoin-optimizer "source-files/${KEY}_${STARTNONCE}_${NONCE_COUNT}_1" -o result-files
+    # Compare files
+    - pushd result-files
+    - find . -type f -exec cmp {} ../expected-result-files/{} \;

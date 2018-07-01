@@ -1,23 +1,27 @@
 # Burstcoin plotting tools
 
 The set of tools that contains everything you need to plot your hard drives for Burstcoin mining in easy and comfortable way.
-The only currently implemented tool is optimizer, but many other tools (including not available elsewhere) are coming.
-Currently implemented tools:
+## Currently implemented tools:
 1. Optimizer
 
-Planned:
-2. OpenCL Plotter
-3. Nonce overlap checker - an easy way to check if any space is wasted
-4. Plotting plan creator and executor - allows to plan plotting of large space by splitting work into as few files as needed and calculating them one by one (useful for scenarios when you can't leave plotting computer 24x7 and have no time to start plotter/optimizer on every startup)
+2. Nonce overlap checker - an easy way to check if any space is wasted
 
-Project features:
+3. Plot planner - automated plotting appliance that searches for existing plot files, calculates a set of free nonces and plots space in folders you want to. Works well on SMR drives (unlike omdcct/cg_obup) by using a temporary folder on a normal hard drive (but you don't have to of course). Since plotter is not implemented yet, cryo's GPU plotter is needed.
+
+## Planned:
+1. OpenCL Plotter
+
+## Project features:
 1. High quality code allows easy modification and many features
+
 2. Automated testing
+
 3. Unit tests gives confidence that your data are correct
 
-Planned:
-4. Resumability - plotting/optimizing can be interrupted in the middle and then resumed
-5. Automation
+## Planned:
+1. Resumability - plotting/optimizing can be interrupted in the middle and then resumed
+
+2. Automation
 
 | Travis status | [![Build Status](https://travis-ci.org/Kristian-Popov/Burstcoin-OpenCL-plotter.svg?branch=master)](https://travis-ci.org/Kristian-Popov/Burstcoin-OpenCL-plotter) |
 | --- | --- |
@@ -47,6 +51,13 @@ At first please clone the repository:
 git clone https://github.com/Kristian-Popov/Burstcoin-OpenCL-plotter.git
 cd Burstcoin-OpenCL-plotter
 git submodule update --init --recursive
+```
+
+A special script is used to keep track of current version, it transparently integrates with Git via hooks, but you have to set up them first and update version for the first time manually:
+
+```
+./setup-hooks.sh
+scripts/update-version.sh
 ```
 
 Now a recent Boost should be downloaded and unpacked:

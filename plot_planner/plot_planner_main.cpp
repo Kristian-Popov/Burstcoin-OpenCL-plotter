@@ -16,6 +16,15 @@
 #include "plot_file_math.h"
 #include "version.h"
 
+const char* const description = R"(
+Burstcoin plot planner,
+an automated appliance that plots given folders as you earn as much BURST as possible and your space is not wasted.
+
+Plots all available space in given folders with plot files skipping nonces already present in other files.
+Plotting is performed preferrably in buffered mode, so this application can be safely used with SMR drives
+(but you need at least some space on a normal hard drive as a temporary storage).
+)";
+
 uint64_t CalcMaxStaggerSizeInNonces( uint64_t staggerSizeInBytes )
 {
     uint64_t staggerSizeInNonces = PlotFileMath::CalcNonceCountInBytes( staggerSizeInBytes );
