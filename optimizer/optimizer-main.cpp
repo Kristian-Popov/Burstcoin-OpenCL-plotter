@@ -13,6 +13,21 @@
 
 #include "optimizer.h"
 
+const char* const description = R"(
+Burstcoin optimizer,
+a tool to optimize Burstcoin plot files.
+
+Files to optimize are given using -i, --input-file command line parameters or without any.
+
+Optimized files by default are put into the same folder as the current input file,
+can be overriden by a -o or --output-dir directories.
+
+Example:
+./burstcoin-optimizer folder1/0_0_1000_10 folder2/2000_0_1000_10
+or
+./burstcoin-optimizer folder1/0_0_1000_10 folder2/2000_0_1000_10 -o optimized-files/
+)";
+
 void CreateOutputDirIfNeeded( std::string& outputDir )
 {
     if ( boost::filesystem::exists( outputDir ) )
@@ -33,7 +48,7 @@ int main( int argc, char** argv )
     namespace log = boost::log::trivial;
     namespace po = boost::program_options;
 
-    boost::program_options::options_description desc( "Allowed options" );
+    boost::program_options::options_description desc( description );
     desc.add_options()
         ( "help,h", "produce help message" )
         ( "input-file,i", po::value<std::vector<std::string>>(), "optimize the specified input files, can be given multiple times" )

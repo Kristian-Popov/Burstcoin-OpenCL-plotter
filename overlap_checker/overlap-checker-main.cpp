@@ -13,15 +13,31 @@
 
 #include "overlap_checker.h"
 
+const char* const description = R"(
+Burstcoin overlap checker,
+a simple tool to check if you have overlapping nonces.
+
+Scans a given set of folders for a plot file so you don't have to select them manually.
+
+Takes a list of directories (either -d, --directory command line parameters or without any key).
+
+Example:
+./burstcoin-overlap-checker /burstcoin-folder-1 /burstcoin-folder-2 /burstcoin-folder-3
+or
+./burstcoin-overlap-checker -d /home/burstcoin-plots
+or
+./burstcoin-overlap-checker --directory /home/burstcoin-plots
+)";
+
 int main( int argc, char** argv )
 {
     namespace log = boost::log::trivial;
     namespace po = boost::program_options;
 
-    boost::program_options::options_description desc( "Allowed options" );
+    boost::program_options::options_description desc( description );
     desc.add_options()
         ( "help,h", "produce help message" )
-        ( "directory,d", po::value<std::vector<std::string>>(), "directory where plot files can be found" )
+        ( "directory,d", po::value<std::vector<std::string>>()->composing(), "directory where plot files can be found" )
         ( "verbose,v", "write debug output. If given, much more output is written" )
         ;
 
@@ -58,12 +74,12 @@ int main( int argc, char** argv )
         log::severity >= ( vm.count( "verbose" ) > 0 ? log::severity_level::trace : log::severity_level::info )
     );
 
-    std::vector<std::string> directories = vm["directory"].as<std::vector<std::string>>();
-    if (directories.empty())
+    if( vm.count( "directory" ) == 0 )
     {
         BOOST_LOG_TRIVIAL( fatal ) << "No directories to search are given, exiting";
         return EXIT_FAILURE;
     }
+    std::vector<std::string> directories = vm["directory"].as<std::vector<std::string>>();
 
     try
     {

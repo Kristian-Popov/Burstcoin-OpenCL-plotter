@@ -18,11 +18,39 @@
 
 const char* const description = R"(
 Burstcoin plot planner,
-an automated appliance that plots given folders as you earn as much BURST as possible and your space is not wasted.
+an automated appliance that plots given folders as you earn as much BURST as possible without wasting you precious
+hard drive space.
 
 Plots all available space in given folders with plot files skipping nonces already present in other files.
 Plotting is performed preferrably in buffered mode, so this application can be safely used with SMR drives
-(but you need at least some space on a normal hard drive as a temporary storage).
+(but you need some space on a normal hard drive as a temporary storage, more is better, 1-2 TiB is optimal).
+
+Planner supports two modes of operation: buffered (required if you use SMR drives, requires temporary storage)
+and direct (does not require temporary storage). Buffered mode is default, direct can be forced by using
+"force-direct-mode" parameter.
+
+Planner takes a list of directories (either -d, --directory command line parameters or without any key),
+plus a separate folder for temporary folder in buffered mode (should not be placed on SMR drive, MUST NOT overlap
+with any plotting directories).
+Algorithm for direct mode works as follows:
+1. Planner scans given directores for existing plot files so you won't have overlaps after plotting,
+2. For every supplied folder: plot all available space as this folder, plot files are created as much as possible
+
+Algorithm for buffered mode works as follows:
+1. Planner scans these directores for existing plot files so you won't have overlaps after plotting,
+2. All plot files are either optimized from temporary storage to a normal one or moved
+(if they are completely optimized),
+3. For every supplied folder:
+    - prepare a temporary unoptimized file on temporary storage, optimize it to a normal folder,
+    - repeat until all space in a given folder is filled.
+
+Usage example for buffered mode:
+./burstcoin-plot-planner /burstcoin-folder-1 /burstcoin-folder-2 /burstcoin-folder-3 -t /burstcoin-temp-folder -k 1337
+In a setup above folders /burstcoin-folder-1 /burstcoin-folder-2 /burstcoin-folder-3 may be located on a SMR drive,
+but /burstcoin-temp-folder MUST be located on a normal (non-SMR) hard drive.
+
+Usage example for direct mode:
+./burstcoin-plot-planner /burstcoin-folder-1 /burstcoin-folder-2 /burstcoin-folder-3 -k 1337
 )";
 
 uint64_t CalcMaxStaggerSizeInNonces( uint64_t staggerSizeInBytes )
@@ -54,7 +82,7 @@ int main( int argc, char** argv )
     namespace po = boost::program_options;
     const static uint64_t defaultMaxBytesVal = ULLONG_MAX;
 
-    boost::program_options::options_description desc( "Allowed options" );
+    boost::program_options::options_description desc( description );
 
     uint64_t maxBytes = 0;
     std::string tempDirectory;

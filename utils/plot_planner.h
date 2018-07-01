@@ -120,6 +120,7 @@ public:
 
             while( noncesToFill > 0 )
             {
+                // TODO take into account amount of free space in temporary storage
                 uint64_t noncesToFillOnThisIteration = noncesToFill;
                 uint64_t nonceNotFittingInStagger = noncesToFillOnThisIteration % maxStaggerSizeInNonces;
                 uint64_t staggerSizeInNonces = maxStaggerSizeInNonces;
@@ -149,7 +150,7 @@ public:
                 NonceNumRange newRange = plotter->Plot( targetDirectory, params, mode );
                 noncesToFill -= newRange.SizeInNonce();
                 EXCEPTION_ASSERT( range == newRange );
-                // Currently new range returned by Plot() must be the same as starting one
+                // TODO Currently new range returned by Plot() must be the same as starting one
 
                 // If we're not filling temporary storage (as in last stage) and we weren't using direct mode,
                 // optimize file from temporary storage to normal folder ("dir")
