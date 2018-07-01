@@ -113,5 +113,5 @@ deploy:
     - build/overlap_checker/burstcoin-overlap-checker
   skip_cleanup: true
   on:
-    - repo: Kristian-Popov/Burstcoin-OpenCL-plotter
-    - tags: true
+    repo: Kristian-Popov/Burstcoin-OpenCL-plotter
+    tags: true
