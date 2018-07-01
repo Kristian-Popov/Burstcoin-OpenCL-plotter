@@ -1,5 +1,5 @@
 #!/bin/bash
-# By some reason we have to set working and repository folder explicitly
+# For some reason we have to set working and repository folder explicitly
 # https://stackoverflow.com/questions/11914933/fatal-not-a-git-repository-git-error
 
 # Get version number (according to Semantic versioning, based on last tag),
